@@ -14,6 +14,10 @@ export async function getStaticPaths() {
 
 const { test } = Astro.props as any;
 const d = test.data;
+
+// Resolve product link if present
+const allProducts = await getCollection("products");
+const linkedProduct = d.productId ? allProducts.find(p => p.data.id === d.productId) : null;
 ---
 
 <ResearchLayout title={`${d.testType} — Research record — EKIS`} description={`Research record ${d.id} — ${d.testType}, dated ${d.testDate?.toLocaleDateString?.() ?? d.testDate}`}>
@@ -33,7 +37,7 @@ const d = test.data;
         <div class="card p-6">
           <h2 class="card-title">Test details</h2>
           <dl class="mt-4 grid gap-3 text-sm">
-            <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Product</dt><dd class="text-[var(--color-muted)]">{d.productId ?? "—"}</dd></div>
+            <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Product</dt><dd class="text-[var(--color-muted)]">{linkedProduct ? <a href={`/products/${linkedProduct.data.slug}`} class="link">{linkedProduct.data.name}</a> : (d.productId ?? "—")}</dd></div>
             <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Type</dt><dd class="text-[var(--color-muted)]">{d.testType}</dd></div>
             <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Environment</dt><dd class="text-[var(--color-muted)]">{d.environment ?? "—"}</dd></div>
             <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Settings</dt><dd class="text-[var(--color-muted)]">{d.settings ?? "—"}</dd></div>

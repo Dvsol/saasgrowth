@@ -1,39 +1,48 @@
 # M3B — Research Infrastructure (placeholder, no fabricated findings)
 
-**Branch:** `arena/bdd56760-saasgrowth@6c76e5b` + M3B (4 deliverables)  
-**Static:** Astro `output: static` + Cloudflare `assets ./dist 404-page` preserved. No DB/auth/CMS/API.
+**Branch:** `arena/bdd56760-saasgrowth@2814433` + QA fixes (accepted)  
+**Static:** Astro `output: static` + Cloudflare `assets ./dist 404-page` preserved. No DB/auth/CMS/API. No deploy.
 
 ## Deliverables
 
 ### 1. Standardised research record template
-- **Layout:** `src/layouts/ResearchLayout.astro` wraps `BaseLayout` + `SiteHeader/Footer`.
-- **Header:** `src/components/research/ResearchHeader.astro` — eyebrow, title, `Tested:` / `Updated:` (ISO → en-CA), `methodologyVersion` chip, `testStatus` chip (`prototype` → “Prototype — not a real test”), `methodology` + `disclosure` + explicit note “Dates, methodology, evidence, scores and limitations are explicit. No finding is fabricated.”
-- **Shared blocks:** `EvidenceList.astro` (links or “Example — not a real test” placeholder), `LimitationsNotice.astro`, `PlaceholderBanner.astro` (`border-warning #FFFBEB` “Example — not a real test”), `ScoreMatrix.astro` for scorecards.
-- **Example:** `src/content/tests/example-research-record.md` → `/research/example-research-record` (prototype, 2026-11-12, environment/settings explicit, evidence [], findings “Placeholder”).
+- **Layout:** `src/layouts/ResearchLayout.astro` wraps `BaseLayout` + `SiteHeader/Footer`. No unused props (hints fixed — removed `eyebrow`/`Container` dead code).
+- **Header:** `src/components/research/ResearchHeader.astro` — eyebrow, title, `Tested:` / `Updated:` (ISO → en-CA), `methodologyVersion` chip, `testStatus` chip (`prototype` → “Prototype — placeholder”), `methodology` + `disclosure` + explicit note. Removed unused `statusLabel` dead code.
+- **Shared blocks:** `EvidenceList`, `LimitationsNotice`, `PlaceholderBanner` (`#FFFBEB`), `ScoreMatrix` (now handles explicit result/verdict objects with taskId/productId/outcome/evidence), `ProductFacts` (pricingCheckedAt as Date).
+- **Example:** `src/content/tests/example-research-record.md` → `/research/example-research-record` (prototype, 2026-11-12, productId `example-product` linked to product profile).
 
 ### 2. Product profile schema
-- **Schema:** `src/content.config.ts:products` — `id, slug, name, website (z.url), category, description, targetAudience, pricing, pricingCheckedAt (explicit string), productStatus, disclosure, limitations, updatedAt (coerce.date)`.
-- **Facts component:** `src/components/research/ProductFacts.astro` — table Website/Category/For/Pricing/Pricing checked/Status/Updated with links, disclosure, limitations.
-- **Page:** `src/pages/products/[slug].astro` (getCollection → static paths) + `src/pages/products/index.astro` listing.
-- **Example:** `src/content/products/example-product.md` → `/products/example-product` — placeholder product, pricingCheckedAt 2026-11-12, disclosure “Placeholder only — no test has been run”.
+- **Schema (strengthened):** `products` — `id, slug, name, website (z.url), category, description, targetAudience?, pricing?, pricingCheckedAt: z.coerce.date().optional() (was z.string), productStatus, testStatus (new: prototype/planned/...), disclosure, limitations, updatedAt: z.coerce.date().optional()` with `glob` loader.
+- **Facts:** `ProductFacts.astro` handles `Date|string` for pricingCheckedAt/updatedAt, formats en-CA, fallbacks `—`.
+- **Page:** `src/pages/products/[slug].astro` now uses `data.testStatus` (not hardcoded prototype), `data.pricingCheckedAt` as `Tested:`, `data.updatedAt` as `Updated:`, and `Profile last checked` footer. Status chip from `productStatus` inside facts.
+- **Example:** `example-product.md` now includes `testStatus: prototype`, `pricingCheckedAt: 2026-11-12` validated as Date.
+- **Index:** `src/pages/products/index.astro` lists all products with pricing checked.
 
-### 3. Scorecard detail page template
-- **Schema:** `scorecards` — `title, department, productIds, taskDefinitions, results, verdicts, methodology, methodologyVersion, testDate, updatedAt, testStatus (prototype/planned/in_progress/completed), disclosure, limitations, evidence`.
-- **Page:** `src/pages/scorecards/[slug].astro` — reuses `ResearchHeader` + `ScoreMatrix` + `ScorecardTable` (prototype shows `— / Pending`, `Tested: —`) + `EvidenceList` + `LimitationsNotice`.
-- **Example:** `src/content/scorecards/example-scorecard.md` → `/scorecards/example-scorecard` — 3 placeholder tasks, results [], prototype, testDate 2026-11-12, methodology v0.2 placeholder, no fabricated scores.
+### 3. Scorecard detail template
+- **Schema (strengthened):** `scorecards` — explicit `results: z.array(scorecardResult).optional()` where `scorecardResult = {taskId, productId, outcome: enum(pass/fail/partial/pending/not_tested/not_applicable), evidence: url|"", note?}` and `verdicts: z.array(scorecardVerdict).optional()` where `scorecardVerdict = {productId, verdict: enum(pass/fail/partial/pending/recommended/not_recommended/not_tested/needs_review), summary?, evidence?}`. `results/verdicts` no longer `z.any()`. `testDate/updatedAt` as `z.coerce.date`.
+- **Page:** `src/pages/scorecards/[slug].astro` — resolves product names via `getCollection("products")` map, renders `Products: <a href="/products/example-product">Example Product — placeholder</a>` instead of raw IDs. Removes 28-char truncation: `tasks={d.taskDefinitions.map((t,i)=>({id:"t"+i, label:t}))}` with `line-clamp-2` CSS instead of `slice(0,28)`. `ScorecardTable` updated to render full labels and link product names, support verdict objects.
+- **Example:** `example-scorecard.md` still `results:[], verdicts:[]` placeholder, no fabricated scores.
+- **Index:** `src/pages/scorecards/index.astro` now dynamic via `getCollection("scorecards")` — grid of cards when present, preserves empty-state `Card muted Upcoming` when empty.
 
 ### 4. AI visibility report template
-- **Schema:** `visibilitySnapshots` — `testedBrand, category, prompts[], platforms[chatgpt,perplexity,gemini], runsPerPrompt, results[], testDate, methodologyVersion, testStatus, limitations, evidence, disclosure`.
-- **Page:** `src/pages/ai-visibility/[slug].astro` — `ResearchHeader` + `VisibilityGrid` (6 prompts → 12-prompt template, Y/N/C/U with `Research coming soon` when empty, `Mention ≠ citation`) + methodology card + `LimitationsNotice` + `EvidenceList`.
-- **Example:** `src/content/visibilitySnapshots/example-visibility.md` → `/ai-visibility/example-visibility` — 6 placeholder prompts, results [], prototype, methodology v0.2 placeholder, no mentions fabricated.
+- **Schema (strengthened):** `visibilitySnapshots` — `platforms: z.array(platformEnum)` (`chatgpt|perplexity|gemini`), `results: z.array(visibilityResult).optional()` where `visibilityResult = {promptId, results: Record<Platform, Y|N|C|U>}` enforcing Y/N/C/U and platforms strictly. `testDate` as `z.coerce.date`.
+- **Page:** `src/pages/ai-visibility/[slug].astro` — `VisibilityGrid` receives explicit rows, methodology card shows `runsPerPrompt` and platforms, `Mention ≠ citation`.
+- **Example:** `example-visibility.md` still `results:[]` placeholder, `platforms:[chatgpt,perplexity,gemini]`, 6 prompts.
+- **Index:** `src/pages/ai-visibility/index.astro` now dynamic — lists snapshots, preserves empty-state card when empty.
 
 ## Content handling
-All 4 example records are `testStatus: prototype` with `PlaceholderBanner` and `Example — not a real test.` copy. Dates (`testDate`, `pricingCheckedAt`, `updatedAt`) are explicit (2026-11-12) or `—`. `audit 0 vulns`, `check 0 errors`, `build 17 pages` (12 existing + 3 new detail + products index + research). Homepage 7 sections intact. Design tokens (`tokens.css`, `global.css` container-shell 1280) unchanged.
+All 4 example records are `testStatus: prototype` with `PlaceholderBanner` and `Example — not a real test` copy. Dates explicit via `z.coerce.date`. Empty states preserved for all indexes. No DB/auth/CMS/API, homepage 7 sections intact (27 KB), design tokens unchanged, 17 pages built, 0 vulns, 0 hints.
 
-## Files created/modified
-- Modified: `src/content.config.ts` (added `glob` loaders, explicit schemas)
-- Created: `src/layouts/ResearchLayout.astro`, `src/components/research/*` (6), `src/content/{departments,products,tests,scorecards,visibilitySnapshots}/example-*.md` (5), `src/pages/{products/[slug].astro,products/index.astro,scorecards/[slug].astro,ai-visibility/[slug].astro,research/[id].astro}`
-- Build: `17 page(s) built` — no deploy.
+## Validation & links
+- Links: scorecard → product profile (actual name + href), research record → product profile (linked name). Verified in `dist/scorecards/example-scorecard/index.html` and `dist/research/example-research-record/index.html`.
+- Empty articles/videos warnings silenced without inventing content: `articles`/`videos` removed from `collections` export (reserved, commented).
+- Hints fixed: `ResearchHeader statusLabel`, `ResearchLayout eyebrow/Container` removed — `check` now `0 errors 0 warnings 0 hints`.
 
-## Next
-No production deploy. Awaiting M3B QA.
+## Files created/modified (QA fixes)
+- Modified: `src/content.config.ts` (strengthened schemas, pricingCheckedAt as date, explicit result/verdict, silence empty collections), `src/layouts/ResearchLayout.astro`, `src/components/research/ResearchHeader.astro`, `src/components/research/ProductFacts.astro`, `src/components/research/ScoreMatrix.astro`, `src/components/scorecards/ScorecardTable.astro`, `src/pages/products/[slug].astro`, `src/pages/scorecards/[slug].astro`, `src/pages/research/[id].astro`, `src/pages/scorecards/index.astro`, `src/pages/ai-visibility/index.astro`, `src/content/products/example-product.md`
+- Verified: `npm audit 0 vulns`, `npm run check 50 files 0/0/0`, `npm run build 17 pages`, `dist/404.html 6.8K`, `output:static`, Cloudflare 404-page.
+
+## Remaining
+- Real data still placeholder empty arrays — no scores, no mentions invented. When real runs are added, must provide dated evidence links per outcome/verdict.
+- Homepage still uses legacy `src/lib/content/*.ts` fixtures for hero/visibility tiles; future M4 will wire to content collections.
+- No deploy — awaiting approval.

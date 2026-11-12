@@ -25,8 +25,9 @@ const products = defineCollection({
     description: z.string(),
     targetAudience: z.string().optional(),
     pricing: z.string().optional(),
-    pricingCheckedAt: z.string().optional(),
+    pricingCheckedAt: z.coerce.date().optional(),
     productStatus: z.enum(["active", "discontinued", "beta"]).optional(),
+    testStatus: z.enum(["planned", "in_progress", "completed", "prototype"]).optional(),
     disclosure: z.string().optional(),
     limitations: z.string().optional(),
     updatedAt: z.coerce.date().optional(),
@@ -52,6 +53,34 @@ const tests = defineCollection({
   }),
 });
 
+// Explicit schemas for scorecards — match rendering requirements
+const scorecardOutcome = z.enum(["pass", "fail", "partial", "pending", "not_tested", "not_applicable"]);
+const scorecardVerdictValue = z.enum([
+  "pass",
+  "fail",
+  "partial",
+  "pending",
+  "recommended",
+  "not_recommended",
+  "not_tested",
+  "needs_review",
+]);
+
+const scorecardResult = z.object({
+  taskId: z.string().min(1),
+  productId: z.string().min(1),
+  outcome: scorecardOutcome,
+  evidence: z.union([z.url(), z.literal("")]).optional(),
+  note: z.string().optional(),
+});
+
+const scorecardVerdict = z.object({
+  productId: z.string().min(1),
+  verdict: scorecardVerdictValue,
+  summary: z.string().optional(),
+  evidence: z.union([z.url(), z.literal("")]).optional(),
+});
+
 const scorecards = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/scorecards" }),
   schema: z.object({
@@ -61,8 +90,8 @@ const scorecards = defineCollection({
     department: z.string(),
     productIds: z.array(z.string()),
     taskDefinitions: z.array(z.string()),
-    results: z.array(z.any()).optional(),
-    verdicts: z.array(z.any()).optional(),
+    results: z.array(scorecardResult).optional(),
+    verdicts: z.array(scorecardVerdict).optional(),
     methodology: z.string().optional(),
     methodologyVersion: z.string().optional(),
     testDate: z.coerce.date().optional(),
@@ -74,6 +103,15 @@ const scorecards = defineCollection({
   }),
 });
 
+// Explicit schemas for AI visibility — enforce platforms and Y/N/C/U
+const platformEnum = z.enum(["chatgpt", "perplexity", "gemini"]);
+const cellStateEnum = z.enum(["Y", "N", "C", "U"]);
+
+const visibilityResult = z.object({
+  promptId: z.string().min(1),
+  results: z.record(platformEnum, cellStateEnum),
+});
+
 const visibilitySnapshots = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/visibilitySnapshots" }),
   schema: z.object({
@@ -82,9 +120,9 @@ const visibilitySnapshots = defineCollection({
     testedBrand: z.string(),
     category: z.string().optional(),
     prompts: z.array(z.string()),
-    platforms: z.array(z.enum(["chatgpt", "perplexity", "gemini"])),
+    platforms: z.array(platformEnum),
     runsPerPrompt: z.number().optional(),
-    results: z.array(z.any()).optional(),
+    results: z.array(visibilityResult).optional(),
     testDate: z.coerce.date().optional(),
     methodologyVersion: z.string().optional(),
     limitations: z.string().optional(),
@@ -94,38 +132,8 @@ const visibilitySnapshots = defineCollection({
   }),
 });
 
-const articles = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/articles" }),
-  schema: z.object({
-    id: z.string(),
-    slug: z.string(),
-    title: z.string(),
-    description: z.string(),
-    department: z.string().optional(),
-    author: z.string().optional(),
-    publishedAt: z.coerce.date().optional(),
-    updatedAt: z.coerce.date().optional(),
-    relatedProducts: z.array(z.string()).optional(),
-    relatedTests: z.array(z.string()).optional(),
-    relatedVideos: z.array(z.string()).optional(),
-    disclosures: z.string().optional(),
-    methodologyVersion: z.string().optional(),
-    limitations: z.string().optional(),
-  }),
-});
+// Reserved for future milestones — not exported to avoid empty-collection warnings without inventing content
+// const articles = defineCollection({...})
+// const videos = defineCollection({...})
 
-const videos = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/videos" }),
-  schema: z.object({
-    id: z.string(),
-    slug: z.string(),
-    title: z.string(),
-    description: z.string(),
-    videoUrl: z.url().optional(),
-    publishedAt: z.coerce.date().optional(),
-    relatedArticles: z.array(z.string()).optional(),
-    relatedProducts: z.array(z.string()).optional(),
-  }),
-});
-
-export const collections = { departments, products, tests, scorecards, visibilitySnapshots, articles, videos };
+export const collections = { departments, products, tests, scorecards, visibilitySnapshots };

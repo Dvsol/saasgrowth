@@ -16,6 +16,14 @@ export async function getStaticPaths() {
 
 const { scorecard } = Astro.props as any;
 const d = scorecard.data;
+
+// Resolve product names for links — preserve prototype labels, no invented data
+const allProducts = await getCollection("products");
+const productMap = new Map(allProducts.map(p => [p.data.id, p.data]));
+const resolvedProducts = d.productIds.map((id: string) => ({
+  id,
+  name: productMap.get(id)?.name ?? id,
+}));
 ---
 
 <ResearchLayout title={`${d.title} — Scorecard — EKIS`} description={d.title}>
@@ -39,12 +47,16 @@ const d = scorecard.data;
       <div class="mt-6 card overflow-hidden p-0">
         <div class="p-5 border-b" style="border-color: var(--color-border)">
           <h2 class="card-title">Product comparison</h2>
-          <p class="research-meta mt-1">Products: {d.productIds.join(", ")} — scores dated per methodology.</p>
+          <p class="research-meta mt-1">
+            Products: {resolvedProducts.map((p: any) => (
+              <a href={`/products/${p.id}`} class="link">{p.name}</a>
+            )).reduce((acc: any, curr: any, idx: number) => idx === 0 ? [curr] : [...acc, ", ", curr], [] as any[])} — scores dated per methodology.
+          </p>
         </div>
         <div class="overflow-x-auto">
           <ScorecardTable
-            products={d.productIds.map((id:string)=>({id, name:id}))}
-            tasks={d.taskDefinitions.map((t:string,i:number)=>({id:`t${i}`, label: t.slice(0,28)}))}
+            products={resolvedProducts}
+            tasks={d.taskDefinitions.map((t:string,i:number)=>({id:`t${i}`, label: t}))}
             testDate={d.testDate ? new Date(d.testDate).toLocaleDateString("en-CA") : null}
             status={d.testStatus as any ?? "prototype"}
             evidenceHref="/method"

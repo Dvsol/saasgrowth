@@ -9,6 +9,7 @@ targetAudience: "Bootstrapped SaaS founders — placeholder"
 pricing: "Pricing data not yet collected — placeholder"
 pricingCheckedAt: "2026-11-12"
 productStatus: "active"
+testStatus: "prototype"
 disclosure: "Placeholder only — no test has been run. No affiliate or vendor payment influences this profile."
 limitations: "This is a structural example. Pricing, features and availability must be re-checked on the vendor site before use."
 updatedAt: 2026-11-12

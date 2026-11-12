@@ -23,7 +23,7 @@ const data = product.data;
     title={data.name}
     testDate={data.pricingCheckedAt}
     updatedAt={data.updatedAt}
-    testStatus="prototype"
+    testStatus={data.testStatus as any ?? "prototype"}
     disclosure={data.disclosure}
   />
   <main id="main" class="section">
@@ -39,7 +39,7 @@ const data = product.data;
       <div class="prose-ekis mt-8">
         <slot />
       </div>
-      <p class="research-meta mt-6">Profile last checked: {data.pricingCheckedAt ?? "—"} — verify pricing on vendor site.</p>
+      <p class="research-meta mt-6">Profile last checked: {data.pricingCheckedAt ? new Date(data.pricingCheckedAt).toLocaleDateString("en-CA") : "—"} — verify pricing on vendor site.</p>
     </Container>
   </main>
 </ResearchLayout>

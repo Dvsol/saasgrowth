@@ -1,9 +1,12 @@
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import SiteHeader from "../../components/layout/SiteHeader.astro";
 import Container from "../../components/shared/Container.astro";
 import Card from "../../components/shared/Card.astro";
 import { siteConfig } from "../../lib/site";
+
+const scorecards = await getCollection("scorecards");
 ---
 
 <BaseLayout title="Scorecards — EKIS" description="Independent scorecards comparing SaaS growth software on the same tasks, same data, scored and dated.">
@@ -11,12 +14,29 @@ import { siteConfig } from "../../lib/site";
   <main id="main" class="section">
     <Container>
       <h1 class="page-title">Scorecards</h1>
-      <p class="supporting mt-2 max-w-prose">Independent tests. Same tasks, same sample data, scored and dated. First scorecard will appear here when testing is complete.</p>
-      <Card muted padding="lg" >
-        <p class="eyebrow">Upcoming</p>
-        <p class="card-title mt-2">AI Search Visibility — initial category</p>
-        <p class="supporting mt-2">Method and task definitions are being documented in <a href="/method" class="link">/method</a>. No fabricated results.</p>
-      </Card>
+      <p class="supporting mt-2 max-w-prose">Independent tests. Same tasks, same sample data, scored and dated. Every score links to its dated evidence.</p>
+
+      {scorecards.length > 0 ? (
+        <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {scorecards.map(s => (
+            <a href={`/scorecards/${s.data.slug}`} class="card p-5 block hover:border-[var(--color-ink)] transition-colors">
+              <p class="eyebrow text-[10px]">{s.data.department}</p>
+              <h3 class="card-title mt-2">{s.data.title}</h3>
+              <p class="supporting mt-2">Tasks: {s.data.taskDefinitions.length} · Products: {s.data.productIds.join(", ")}</p>
+              <p class="research-meta mt-3">
+                Tested: {s.data.testDate ? new Date(s.data.testDate).toLocaleDateString("en-CA") : "—"} · <span class="chip !py-1 text-[10px]">{s.data.testStatus === "prototype" ? "Prototype" : s.data.testStatus ?? "—"}</span>
+              </p>
+              <p class="meta mt-2">Method: {s.data.methodologyVersion ?? "—"}</p>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <Card muted padding="lg">
+          <p class="eyebrow">Upcoming</p>
+          <p class="card-title mt-2">AI Search Visibility — initial category</p>
+          <p class="supporting mt-2">Method and task definitions are being documented in <a href="/method" class="link">/method</a>. No fabricated results.</p>
+        </Card>
+      )}
     </Container>
   </main>
 </BaseLayout>

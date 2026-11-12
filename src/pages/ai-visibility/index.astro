@@ -1,10 +1,14 @@
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import SiteHeader from "../../components/layout/SiteHeader.astro";
 import Container from "../../components/shared/Container.astro";
 import Card from "../../components/shared/Card.astro";
 import { siteConfig } from "../../lib/site";
+
+const snapshots = await getCollection("visibilitySnapshots");
 ---
+
 <BaseLayout title="AI Visibility — EKIS" description="Where do AI platforms mention this brand? Dated snapshots across ChatGPT, Perplexity and Gemini.">
   <SiteHeader logoText={siteConfig.brand.name} navigationItems={[...siteConfig.nav]} activePath="/ai-visibility" />
   <main id="main" class="section">
@@ -12,9 +16,26 @@ import { siteConfig } from "../../lib/site";
       <p class="eyebrow">AI Search Visibility</p>
       <h1 class="page-title mt-2">AI Visibility</h1>
       <p class="supporting mt-2 max-w-prose">Prompt-level snapshots. Y = mentioned, N = not mentioned, C = citation, U = unable to determine. Mention ≠ citation. Each result links to its test record (M2).</p>
-      <Card muted padding="lg" >
-        <p class="meta">No published snapshots yet — structure is ready for M2. No fabricated mentions.</p>
-      </Card>
+
+      {snapshots.length > 0 ? (
+        <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {snapshots.map(s => (
+            <a href={`/ai-visibility/${s.data.slug}`} class="card p-5 block hover:border-[var(--color-ink)] transition-colors">
+              <p class="eyebrow text-[10px]">{s.data.category ?? "AI Search Visibility"}</p>
+              <h3 class="card-title mt-2">AI visibility: {s.data.testedBrand}</h3>
+              <p class="supporting mt-2">{s.data.prompts.length} prompts · {s.data.platforms.join(", ")}</p>
+              <p class="research-meta mt-3">
+                Tested: {s.data.testDate ? new Date(s.data.testDate).toLocaleDateString("en-CA") : "—"} · <span class="chip !py-1 text-[10px]">{s.data.testStatus === "prototype" ? "Prototype" : s.data.testStatus ?? "—"}</span>
+              </p>
+              <p class="meta mt-2">{s.data.testStatus === "prototype" ? "Example — not a real test" : `Method: ${s.data.methodologyVersion ?? "—"}`}</p>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <Card muted padding="lg">
+          <p class="meta">No published snapshots yet — structure is ready for M2. No fabricated mentions.</p>
+        </Card>
+      )}
     </Container>
   </main>
 </BaseLayout>

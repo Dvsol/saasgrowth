@@ -2,17 +2,15 @@
 import BaseLayout from "./BaseLayout.astro";
 import SiteHeader from "../components/layout/SiteHeader.astro";
 import SiteFooter from "../components/layout/SiteFooter.astro";
-import Container from "../components/shared/Container.astro";
 import { siteConfig } from "../lib/site";
 
 export interface Props {
   title: string;
   description: string;
-  eyebrow?: string;
   noindex?: boolean;
 }
 
-const { title, description, eyebrow, noindex } = Astro.props;
+const { title, description, noindex } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} noindex={noindex}>

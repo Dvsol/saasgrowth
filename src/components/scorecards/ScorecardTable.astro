@@ -3,11 +3,12 @@
  * ScorecardTable — reusable, spec §7
  * Props mirror spec: products, tasks, verdicts, testDate, status, evidenceLinks
  * Must not display invented values; shows empty state when prototype.
+ * Now supports explicit verdict objects with productId/verdict/evidence.
  */
 export interface Props {
   products: { id: string; name: string }[];
   tasks: { id: string; label: string }[];
-  verdicts?: (string | null)[];
+  verdicts?: Array<string | null | { productId: string; verdict: string; summary?: string; evidence?: string }>;
   testDate?: string | null;
   status: "prototype" | "planned" | "in_progress" | "completed";
   evidenceHref?: string;
@@ -16,6 +17,18 @@ export interface Props {
 const { products, tasks, verdicts, testDate, status, evidenceHref, disclosure } = Astro.props;
 
 const isPrototype = status === "prototype";
+
+function verdictFor(productId: string, idx: number): string | null {
+  if (!verdicts || verdicts.length === 0) return null;
+  // Prefer matching by productId for explicit objects
+  for (const v of verdicts) {
+    if (v && typeof v === "object" && "productId" in v && (v as any).productId === productId) return (v as any).verdict;
+  }
+  const v = verdicts[idx];
+  if (!v) return null;
+  if (typeof v === "object" && v !== null && "verdict" in v) return (v as any).verdict;
+  return v as string;
+}
 ---
 
 <div class="card overflow-hidden p-0">
@@ -33,17 +46,17 @@ const isPrototype = status === "prototype";
       <thead class="bg-[var(--color-surface)] text-[var(--color-muted)]">
         <tr>
           <th scope="col" class="px-4 py-3 font-semibold whitespace-nowrap">Product</th>
-          {tasks.map((t) => <th scope="col" class="px-4 py-3 font-semibold whitespace-nowrap">{t.label}</th>)}
+          {tasks.map((t) => <th scope="col" class="px-4 py-3 font-semibold whitespace-nowrap max-w-[280px]"><span class="line-clamp-2">{t.label}</span></th>)}
           <th scope="col" class="px-4 py-3 font-semibold whitespace-nowrap">Verdict</th>
         </tr>
       </thead>
       <tbody class="divide-y" style="border-color: var(--color-border)">
         {products.map((p, i) => (
           <tr>
-            <th scope="row" class="px-4 py-3 font-medium whitespace-nowrap">{p.name}</th>
+            <th scope="row" class="px-4 py-3 font-medium whitespace-nowrap"><a href={`/products/${p.id}`} class="link">{p.name}</a></th>
             {tasks.map(() => <td class="px-4 py-3 text-[var(--color-muted)]">—</td>)}
             <td class="px-4 py-3">
-              {isPrototype ? <span class="chip">Pending</span> : verdicts?.[i] ? verdicts[i] : <span class="chip">Pending</span>}
+              {isPrototype ? <span class="chip">Pending</span> : verdictFor(p.id, i) ? verdictFor(p.id, i) : <span class="chip">Pending</span>}
             </td>
           </tr>
         ))}

@@ -17,7 +17,6 @@ function fmt(d?: Date | string | null) {
   const dt = d instanceof Date ? d : new Date(d);
   return isNaN(dt.getTime()) ? String(d) : dt.toLocaleDateString("en-CA");
 }
-const statusLabel = testStatus === "prototype" ? "Prototype — not a real test" : testStatus ? testStatus.replace("_"," ") : "—";
 ---
 
 <header class="border-b" style="border-color: var(--color-border); background: var(--color-surface)">

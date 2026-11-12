@@ -1,12 +1,19 @@
 ---
 export interface Props {
   taskDefinitions: string[];
-  results?: any[];
-  verdicts?: any[];
+  results?: Array<{ taskId: string; productId: string; outcome: string; evidence?: string; note?: string } | string>;
+  verdicts?: Array<{ productId: string; verdict: string; summary?: string; evidence?: string } | string>;
   testStatus?: string | null;
 }
 const { taskDefinitions, results, verdicts, testStatus } = Astro.props as Props;
 const isPrototype = !results || results.length === 0 || testStatus === "prototype";
+
+function isResultObject(r: any): r is { taskId: string; productId: string; outcome: string; evidence?: string } {
+  return r && typeof r === "object" && "taskId" in r && "outcome" in r;
+}
+function isVerdictObject(v: any): v is { productId: string; verdict: string } {
+  return v && typeof v === "object" && "productId" in v && "verdict" in v;
+}
 ---
 
 <section aria-labelledby="scores-heading" class="card overflow-hidden p-0">
@@ -23,10 +30,35 @@ const isPrototype = !results || results.length === 0 || testStatus === "prototyp
     </div>
   ) : (
     <div class="p-6">
-      <p class="supporting">Tasks and verdicts — dated, evidenced.</p>
+      <p class="supporting">Tasks and verdicts — dated, evidenced. Task identifiers, outcomes and evidence are explicit.</p>
       <ul class="mt-3 space-y-2 text-sm">
-        {taskDefinitions.map((t,i) => <li><span class="font-semibold">{t}:</span> {results?.[i] ?? "Pending"} — {verdicts?.[i] ?? "—"}</li>)}
+        {taskDefinitions.map((t,i) => {
+          const taskId = `t${i}`;
+          // Find results for this taskId if explicit objects, else fallback to index
+          const taskResults = results?.filter(r => isResultObject(r) && (r as any).taskId === taskId) ?? [];
+          const legacy = !isResultObject(results?.[i]) ? results?.[i] : null;
+          return (
+            <li>
+              <span class="font-semibold">{t}:</span>
+              {taskResults.length > 0 ? (
+                <span class="text-[var(--color-muted)]"> {taskResults.map((r:any) => `${r.productId}: ${r.outcome}${r.evidence ? ` (evidence: ${r.evidence})` : ""}`).join(" · ")}</span>
+              ) : (
+                <span class="text-[var(--color-muted)]"> {legacy ?? "Pending"} — {isVerdictObject(verdicts?.[i]) ? (verdicts[i] as any).verdict : verdicts?.[i] ?? "—"}</span>
+              )}
+            </li>
+          );
+        })}
       </ul>
+      {verdicts && verdicts.length > 0 && (
+        <div class="mt-4">
+          <p class="research-meta">Verdicts:</p>
+          <ul class="mt-2 space-y-1 text-sm text-[var(--color-muted)] list-disc list-inside">
+            {verdicts.map(v => (
+              <li>{isVerdictObject(v) ? `${(v as any).productId}: ${(v as any).verdict}${(v as any).evidence ? ` — evidence: ${(v as any).evidence}` : ""}${(v as any).summary ? ` — ${(v as any).summary}` : ""}` : String(v)}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   )}
 </section>
