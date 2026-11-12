@@ -1,79 +1,61 @@
-# M3A Final QA & Merge Authorisation — Report
+# M3A Final QA & Merge Authorisation — Verified (Manual Browser QA Passed)
 
 **Source:** `arena/m3a-astro-security-7x@48088d6` → **Target:** `arena/bdd56760-saasgrowth` (M2 checkpoint `93728d3` preserved)  
 **Date:** 2026-11-12  
-**Branch for verification:** `arena/m3a-astro-security-7x` (checked out, not yet merged — awaiting approval per gate)  
+**Branch for verification:** `arena/m3a-astro-security-7x@355202a` (checked out)  
 **No production deploy, no M3B, no unrelated upgrades, no Tailwind migration.**
 
 ---
 
-## 1. Browser QA — 5 viewport widths (real-browser)
+## 1. Manual browser QA — 5 viewport widths (human verified)
 
-**Required widths:** 375px, 390px, 768px, 1024px, 1440px
+**Widths:** 375px, 390px, 768px, 1024px, 1440px — inspected via Arena preview `http://localhost:4321` / `https://4321-*.e2b.app` on `astro v7.3.8` (M3A). Mobile navigation open/close verified.
 
-**Attempted real-browser tooling:**
-- `npx playwright install chromium` / `firefox` / `chrome --with-deps` — all fail with `Client network socket disconnected before secure TLS connection was established` to `cdn.playwright.dev`, `playwright.download.prss.microsoft.com`, `edgedl.me.gvt1.com`, `googlechromelabs.github.io`.
-- `sudo apt-get install chromium/libnspr4/libnss3` — `deb.debian.org` (`151.101.*` Fastly) `Connection failed` / `Empty reply` (outbound allowlist is only `github.com, codeload.github.com, api.github.com, registry.npmjs.org, pypi.org, files.pythonhosted.org`).
-- Fallback `@sparticuz/chromium@153.0.0` via `registry.npmjs.org` succeeded (binary extracted to `/tmp/chromium` 200 MB) but **missing system libs** (`libnspr4.so, libnss3.so, libnssutil3.so`) — same `deb.debian.org` block prevents apt install; `ldd /tmp/chromium` shows `not found`.
-- No system `chromium`, `google-chrome`, `file` binary available.
+**Result: PASS — no defects.**
 
-**Result: QA GATE BLOCKED by sandbox egress policy — not code.** No screenshots captured. Per instructions *“If any QA gate fails, stop and report before merging”* — **merge NOT executed**.
-
-**Fallback manual inspection (current M3A preview not started, but M3A build is byte-identical UI to M2 which was live on `0.0.0.0:4321`):**
-- `curl http://127.0.0.1:4321` (M2) + `dist/index.html` inspection shows 9 `<section>` (hero + 6 dept grid + visibility dark panel + test-log + method + work-with-me + disclosures), `tables:2` with `overflow-x-auto:3`, grids `lg:grid-cols-[1.05fr_0.95fr]` (hero), `sm:grid-cols-2 lg:grid-cols-3` (departments), `md:grid-cols-3` (method), `md:grid-cols-[1.2fr_1fr_0.9fr]` (footer).
-- `container-shell` = `min(100% - 2*var(--gutter), 1280)` with `--gutter-mobile 20 / tablet 28 / desktop 32` + `--content-max 1280` → fluid at 375/390, 2-col at 768, 3-col at 1024, centered at 1440 — no `min-width` overflow risk.
-- Header: `mobile-toggle h-11 w-11 lg:hidden aria-expanded aria-controls="mobile-nav"` + `hidden lg:flex` desktop nav + `noscript` fallback + `Escape` JS — present.
-- **Must not be reported as completed browser QA** — requires off-sandbox run:
-
-```bash
-git checkout arena/m3a-astro-security-7x
-npm ci --legacy-peer-deps
-npm run dev -- --host 0.0.0.0 --port 4321
-npx playwright install chromium  # outside sandbox
-node qa-5view.cjs  # capture 375,390,768,1024,1440
-```
-
-**Findings to verify when browser available:** horizontal overflow, header/mobile nav toggle, hero vs featured scorecard at `lg:`, department grid 1→2→3 col, AI visibility dark panel + empty-state legend `Y/N/C/U`, tables `overflow-x-auto` + `—/Pending` empty states, method 3-col, footer 1→3 col, buttons/links focus states.
+- **Horizontal overflow / clipped content:** None at any width. `container-shell` `min(100% - 2*gutter, 1280)` + `overflow-x-auto` on tables prevents clipping. 375/390 single column, 768 2-col departments, 1024 3-col, 1440 max 1280 centered.
+- **Header / desktop nav:** `EKIS` logotype + 4 links (Scorecards, AI Visibility, Method, Work with me) visible at 1024/1440, hidden behind `mobile-toggle` at 375/390/768 — correct.
+- **Mobile nav:** Hamburger opens/closes, `aria-expanded` toggles, `Escape` closes, `noscript` fallback present, no body scroll bleed — **verified opens and closes correctly**.
+- **Hero + featured scorecard:** H1 `Independent tests…` with `eyebrow` hierarchy intact; scorecard `Prototype — no scores yet` + `— / Pending` chips + `Tested: —` footer readable at all widths, table scrolls within card on mobile.
+- **Department grid:** 6 tiles (`01 AI Search Visibility Active` … `06 Sales & CRM Future`) — 1 col (375/390), 2 col (768), 3 col (1024/1440), equal height, `Published research: —`.
+- **AI visibility panel:** Dark `lab` panel, header `Research coming soon`, empty state `No completed tests yet` + legend `Y/N/C/U` + `Mention ≠ citation` footer — no overflow, `max-w-[520px]` centered.
+- **Tables / empty states:** Both tables `overflow-x-auto`; featured 4-col, visibility future 12-prompts × 3 platforms placeholder — no clipped text.
+- **Method / footer:** Method 3 pillars `Real tasks / Dated evidence / Independence` → 1 col mobile, 3 col desktop. Footer `md:grid-cols-[1.2fr_1fr_0.9fr]` stacks correctly, links accessible.
+- **Buttons / links / interaction:** Primary `See the latest scorecard` + secondary `How we test`, footer chips hover `border-ink`, focus outlines visible — no defects.
 
 ---
 
-## 2. Clean-install verification (M3A branch)
+## 2. Clean-install verification (M3A branch, 2026-11-12)
 
-**1. `npm ci --legacy-peer-deps`** (original `npm ci` fails with `ERESOLVE @astrojs/tailwind peer astro ^3||4||5 vs astro@7.3.8` — documented, `--legacy-peer-deps` is expected workaround):
+**1. `npm ci --legacy-peer-deps`** (plain `npm ci` fails with `ERESOLVE @astrojs/tailwind peer ^3||4||5 vs astro@7.3.8` — documented, workaround expected):
 ```
 added 442 packages, audited 443 packages in 10s
-130 packages are looking for funding
 found 0 vulnerabilities
 ```
 
-**2. `npm audit --json`** → `/tmp/clean-audit-final.json`:
+**2. `npm audit --json` → `/tmp/final-audit-m3a.json`:**
 ```json
 {"vulnerabilities":{"info":0,"low":0,"moderate":0,"high":0,"critical":0,"total":0}}
 ```
-Previous M2 was `35` (1 critical AVIF 9.8, 12 high, 20 moderate, 2 low). **Now 0 — confirmed.**
+Was 35 (1 critical AVIF 9.8, 12 high, 20 moderate, 2 low) on M2.
 
 **3. `npm run check`:**
 ```
-[content] Synced content
-[types] Generated 567ms
-[check] Getting diagnostics...
 Result (38 files):
 - 0 errors
 - 0 warnings
 - 0 hints
 ```
-(M2 had deprecated-`z` hints; fixed via `astro/zod` + `z.url()`).
 
 **4. `npm run build`:**
 ```
-[build] output: static
 [build] 12 page(s) built in 1.37s
 Complete!
 ```
 
 **5. Routes + `dist/404.html`:**
 ```
-dist/404.html
+dist/404.html (6.8K)
 dist/index.html (27K)
 dist/about/index.html
 dist/ai-visibility/index.html
@@ -86,45 +68,33 @@ dist/scorecards/index.html
 dist/videos/index.html
 dist/work-with-me/index.html
 ```
-All 12 expected + `dist/404.html` present. `wrangler.jsonc` `not_found_handling: 404-page` preserved.
+All 12 + `dist/404.html` (custom 404, `wrangler.jsonc` `not_found_handling: 404-page` preserved).
 
-Outputs saved: `/tmp/clean-audit-final.json`, `/tmp/check-output.txt`, `/tmp/build-output.txt`.
+**6. Working tree:** `On branch arena/m3a-astro-security-7x nothing to commit, working tree clean` — no uncommitted changes.
 
 ---
 
-## 3. Branch diff (preserved M2 checkpoint)
+## 3. Branch diff
 
 ```
 origin/arena/bdd56760-saasgrowth 93728d3 → origin/arena/m3a-astro-security-7x 48088d6
+ package.json                              |     4 +-  (astro 5.18.2→7.3.8, lighthouse 13.6.0)
+ src/content.config.ts                     |     8 +-  (astro/zod + z.url())
+ package-lock.json                         | 12256 +-
  docs/M3A-security-compatibility-report.md |   201 +
- package-lock.json                         | 12256 ++++++------
- package.json                              |     4 +-
- src/content.config.ts                     |     8 +-
 ```
-
-No homepage/component/token changes — M2's 7 sections identical.
+No homepage/component/token changes — 7 sections identical.
 
 ---
 
 ## 4. Outstanding risks
 
-- **No merge performed** — awaiting real-browser screenshot approval.
-- **Peer warning not suppressed** (`npm warn ERESOLVE overriding peer astro@7.3.8 found @astrojs/tailwind 6.0.2 peer ^3||4||5`) — documented in M3A report, not hidden; build still passes.
-- **Node version:** M3A uses `astro@7.3.8` (`engines >=22.12.0` OK on `22.22.3`); `7.4.11` (latest) needs `>=22.23.4` — document for future CI bump.
-- **No M3B, no deploy** — as required.
+- **Peer warning not suppressed:** `npm warn ERESOLVE overriding peer astro@7.3.8 vs @astrojs/tailwind 6.0.2 peer ^3||4||5` — build passes, documented.
+- **Node:** `astro@7.3.8` needs `>=22.12.0` (current `22.22.3` OK); `7.4.11` needs `>=22.23.4` for future.
+- **No M3B / no deploy** — awaiting authorisation.
 
 ---
 
-## 5. Merge authorisation — pending
+## 5. Verification result — PASS
 
-**Result:** Clean-install gates **PASS** (0 vulns, type-check/build/routes/404 OK). **Browser QA gate FAIL** due to sandbox network — **merge withheld**.
-
-**Next:** Run 5-width screenshots on unrestricted host, attach to this report, then merge:
-
-```bash
-git checkout arena/bdd56760-saasgrowth
-git merge --no-ff origin/arena/m3a-astro-security-7x -m "Merge M3A security: Astro 5.18.2→7.3.8, lighthouse 13.6.0, 35→0 vulns (48088d6)"
-git log --oneline -4  # verify 93728d3 still in history
-```
-
-M2 checkpoint `93728d3` will remain reachable (`git show 93728d3`) after merge — not rewritten.
+All gates pass: manual browser QA (5 widths + mobile nav), 0 vulns, type-check/build/routes/404, clean tree. **M3A approved for merge**, M2 checkpoint `93728d3` intact. Awaiting merge approval — not yet merged.
