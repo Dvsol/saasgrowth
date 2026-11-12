@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteHeader from "../../components/layout/SiteHeader.astro";
+import Container from "../../components/shared/Container.astro";
+import Card from "../../components/shared/Card.astro";
+import { siteConfig } from "../../lib/site";
+---
+<BaseLayout title="AI Visibility — EKIS" description="Where do AI platforms mention this brand? Dated snapshots across ChatGPT, Perplexity and Gemini.">
+  <SiteHeader logoText={siteConfig.brand.name} navigationItems={[...siteConfig.nav]} activePath="/ai-visibility" />
+  <main id="main" class="section">
+    <Container>
+      <p class="eyebrow">AI Search Visibility</p>
+      <h1 class="page-title mt-2">AI Visibility</h1>
+      <p class="supporting mt-2 max-w-prose">Prompt-level snapshots. Y = mentioned, N = not mentioned, C = citation, U = unable to determine. Mention ≠ citation. Each result links to its test record (M2).</p>
+      <Card muted padding="lg" >
+        <p class="meta">No published snapshots yet — structure is ready for M2. No fabricated mentions.</p>
+      </Card>
+    </Container>
+  </main>
+</BaseLayout>

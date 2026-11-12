@@ -1,0 +1,17 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/layout/SiteHeader.astro";
+import Container from "../components/shared/Container.astro";
+import Card from "../components/shared/Card.astro";
+import { siteConfig } from "../lib/site";
+---
+<BaseLayout title="Work with me — EKIS" description="Comparison and alternatives pages with product testing and AI visibility snapshots.">
+  <SiteHeader logoText={siteConfig.brand.name} navigationItems={[...siteConfig.nav]} activePath="/work-with-me" />
+  <main id="main" class="section">
+    <Container narrow>
+      <p class="eyebrow">Work with me</p>
+      <h1 class="page-title mt-2">Work with me</h1>
+      <Card><p class="card-title">Comparison & alternatives pages</p><p class="supporting mt-2">1,200–1,800 words · product testing · AI snapshot · day 30 & 60 rechecks. No promise of rankings or citations.</p></Card>
+    </Container>
+  </main>
+</BaseLayout>

@@ -1,0 +1,21 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/layout/SiteHeader.astro";
+import Container from "../components/shared/Container.astro";
+import { siteConfig } from "../lib/site";
+---
+
+<BaseLayout title="How we test — EKIS" description="Same tasks. Consistent settings. Dated evidence. Independent verdicts.">
+  <SiteHeader logoText={siteConfig.brand.name} navigationItems={[...siteConfig.nav]} activePath="/method" />
+  <main id="main" class="section">
+    <Container narrow>
+      <p class="eyebrow">Method</p>
+      <h1 class="page-title mt-2">How we test</h1>
+      <p class="supporting mt-3">Same tasks. Consistent settings. Dated evidence. Independent verdicts. Full methodology will be published here in Milestone 2.</p>
+      <h2 class="section-title mt-8">Three-task software testing</h2>
+      <p class="prose-ekis">Each product completes the same three tasks on the same sample data. Evidence is linked per task.</p>
+      <h2 class="section-title mt-8">12-prompt AI visibility snapshot</h2>
+      <p class="prose-ekis">We test where AI platforms mention a brand across 12 prompts, recording Y (mentioned), N (not mentioned), C (citation), U (unable to determine / run failed). Mention ≠ citation.</p>
+    </Container>
+  </main>
+</BaseLayout>

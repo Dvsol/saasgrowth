@@ -1,0 +1,10 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/layout/SiteHeader.astro";
+import Container from "../components/shared/Container.astro";
+import { siteConfig } from "../lib/site";
+---
+<BaseLayout title="Contact — EKIS" description="Contact EKIS.">
+  <SiteHeader logoText={siteConfig.brand.name} navigationItems={[...siteConfig.nav]} />
+  <main id="main" class="section"><Container narrow><h1 class="page-title">Contact</h1><p class="supporting mt-2">Reach out via the Work with me page.</p></Container></main>
+</BaseLayout>

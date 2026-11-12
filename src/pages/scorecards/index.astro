@@ -1,0 +1,22 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteHeader from "../../components/layout/SiteHeader.astro";
+import Container from "../../components/shared/Container.astro";
+import Card from "../../components/shared/Card.astro";
+import { siteConfig } from "../../lib/site";
+---
+
+<BaseLayout title="Scorecards — EKIS" description="Independent scorecards comparing SaaS growth software on the same tasks, same data, scored and dated.">
+  <SiteHeader logoText={siteConfig.brand.name} navigationItems={[...siteConfig.nav]} activePath="/scorecards" />
+  <main id="main" class="section">
+    <Container>
+      <h1 class="page-title">Scorecards</h1>
+      <p class="supporting mt-2 max-w-prose">Independent tests. Same tasks, same sample data, scored and dated. First scorecard will appear here when testing is complete.</p>
+      <Card muted padding="lg" >
+        <p class="eyebrow">Upcoming</p>
+        <p class="card-title mt-2">AI Search Visibility — initial category</p>
+        <p class="supporting mt-2">Method and task definitions are being documented in <a href="/method" class="link">/method</a>. No fabricated results.</p>
+      </Card>
+    </Container>
+  </main>
+</BaseLayout>

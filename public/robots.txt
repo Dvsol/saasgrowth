@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ekis.example.com/sitemap-index.xml

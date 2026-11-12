@@ -1,0 +1,16 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/layout/SiteHeader.astro";
+import Container from "../components/shared/Container.astro";
+import { siteConfig } from "../lib/site";
+---
+<BaseLayout title="Independence & Disclosure — EKIS" description="Payment never changes an independent score.">
+  <SiteHeader logoText={siteConfig.brand.name} navigationItems={[...siteConfig.nav]} activePath="/independence" />
+  <main id="main" class="section">
+    <Container narrow>
+      <p class="eyebrow">Independence</p>
+      <h1 class="page-title mt-2">Independence and disclosure</h1>
+      <p class="prose-ekis mt-3"><strong>Payment never changes an independent score.</strong> All relationships are disclosed per test. Full policy in M2.</p>
+    </Container>
+  </main>
+</BaseLayout>

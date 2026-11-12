@@ -1,0 +1,72 @@
+/* EKIS Design Tokens — single source of truth. Components must use variables, never hardcode. */
+:root {
+  /* Colors — per spec 5. Design tokens */
+  --color-ink: #142B4A;
+  --color-blue: #2563EB;
+  --color-paper: #FFFFFF;
+  --color-surface: #F7F9FC;
+  --color-border: #E2E8F0;
+  --color-muted: #475569;
+  --color-lab: #0B1220;
+  --color-success: #15803D;
+  --color-danger: #B91C1C;
+  --color-warning: #A16207;
+
+  /* Derived for subtle states */
+  --color-paper-rgb: 255 255 255;
+  --color-ink-rgb: 20 43 74;
+  --color-surface-rgb: 247 249 252;
+  --color-border-rgb: 226 232 240;
+
+  /* Typography — Inter only per spec */
+  --font-sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+  /* Type scale (desktop) — clamp provides mobile scaling */
+  --text-hero: clamp(2.25rem, 1.2rem + 4vw, 3.5rem); /* 36-40 mobile → 52-60 desktop */
+  --text-hero-sm: clamp(2rem, 1.1rem + 3vw, 3rem);
+  --text-page-heading: clamp(2rem, 1.5rem + 2vw, 3rem); /* 32-36 mobile → 40-48 desktop */
+  --text-section-heading: clamp(1.5rem, 1.2rem + 1vw, 2rem); /* 24-28 → 28-32 */
+  --text-card-heading: 1.125rem; /* 18px */
+  --text-body: clamp(1rem, 0.97rem + 0.15vw, 1.125rem); /* 16-18 */
+  --text-supporting: 0.875rem; /* 14 */
+  --text-meta: 0.8125rem; /* 13 */
+  --text-table: 0.8125rem; /* 13-14 */
+
+  --leading-body: 1.6;
+  --leading-heading: 1.15;
+  --leading-tight: 1.05;
+  --reading-width: 720px; /* 680-740 */
+
+  /* Spacing — 4px base */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* Layout */
+  --content-max: 1280px; /* 1200-1280 per spec */
+  --content-max-narrow: 740px;
+  --gutter-desktop: 32px;
+  --gutter-tablet: 28px;
+  --gutter-mobile: 20px;
+
+  /* Borders */
+  --radius-card: 12px; /* 8-12 */
+  --radius-card-sm: 8px;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --border-color: var(--color-border);
+
+  /* Shadows — minimal per spec */
+  --shadow-subtle: 0 1px 2px rgba(20, 43, 74, 0.06);
+  --shadow-card: 0 1px 2px rgba(20, 43, 74, 0.06), 0 4px 12px rgba(20, 43, 74, 0.04);
+
+  /* Focus */
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.32);
+  --focus-ring-offset: 0 0 0 2px var(--color-paper);
+}

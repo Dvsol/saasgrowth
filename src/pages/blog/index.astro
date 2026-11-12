@@ -1,0 +1,10 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteHeader from "../../components/layout/SiteHeader.astro";
+import Container from "../../components/shared/Container.astro";
+import { siteConfig } from "../../lib/site";
+---
+<BaseLayout title="blog — EKIS" description="Future-ready route.">
+  <SiteHeader logoText={siteConfig.brand.name} navigationItems={[...siteConfig.nav]} />
+  <main id="main" class="section"><Container><h1 class="page-title capitalize">blog</h1><p class="supporting mt-2">Placeholder — future-ready route per spec §9.</p></Container></main>
+</BaseLayout>

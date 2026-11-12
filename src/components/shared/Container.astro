@@ -1,0 +1,12 @@
+---
+export interface Props {
+  narrow?: boolean;
+  id?: string;
+  as?: "div" | "section" | "nav" | "header" | "footer";
+}
+const { narrow = false, id, as: Tag = "div" } = Astro.props;
+---
+
+<Tag id={id} class={narrow ? "container-narrow" : "container-shell"}>
+  <slot />
+</Tag>
