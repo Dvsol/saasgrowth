@@ -1,0 +1,12 @@
+---
+export interface Props {
+  limitations?: string | null;
+}
+const { limitations } = Astro.props as Props;
+---
+
+<section aria-labelledby="limitations-heading" class="card p-6" style="background: var(--color-surface)">
+  <h2 id="limitations-heading" class="card-title">Limitations</h2>
+  <p class="supporting mt-3">{limitations ?? "No limitations recorded yet. When published, this section will describe what was not tested, sample size, and known constraints."}</p>
+  <p class="research-meta mt-3">Limitations are explicit. A product not tested is shown as Pending, not scored.</p>
+</section>

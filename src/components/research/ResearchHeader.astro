@@ -1,0 +1,37 @@
+---
+export interface Props {
+  eyebrow?: string;
+  title: string;
+  testDate?: Date | string | null;
+  updatedAt?: Date | string | null;
+  methodology?: string | null;
+  methodologyVersion?: string | null;
+  testStatus?: "planned" | "in_progress" | "completed" | "prototype" | null;
+  disclosure?: string | null;
+}
+
+const { eyebrow, title, testDate, updatedAt, methodology, methodologyVersion, testStatus, disclosure } = Astro.props as Props;
+
+function fmt(d?: Date | string | null) {
+  if (!d) return "—";
+  const dt = d instanceof Date ? d : new Date(d);
+  return isNaN(dt.getTime()) ? String(d) : dt.toLocaleDateString("en-CA");
+}
+const statusLabel = testStatus === "prototype" ? "Prototype — not a real test" : testStatus ? testStatus.replace("_"," ") : "—";
+---
+
+<header class="border-b" style="border-color: var(--color-border); background: var(--color-surface)">
+  <div class="container-shell py-8">
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1 class="page-title mt-2">{title}</h1>
+    <div class="mt-4 flex flex-wrap gap-2">
+      <span class="chip">{testStatus === "prototype" ? "Prototype — placeholder" : testStatus ? testStatus : "Status: —"}</span>
+      <span class="chip">Tested: {fmt(testDate)}</span>
+      {updatedAt && <span class="chip">Updated: {fmt(updatedAt)}</span>}
+      {methodologyVersion && <span class="chip">{methodologyVersion}</span>}
+    </div>
+    {methodology && <p class="research-meta mt-3 max-w-prose">Method: {methodology}</p>}
+    {disclosure && <p class="research-meta mt-2 max-w-prose font-medium text-[var(--color-ink)]">{disclosure}</p>}
+    <p class="research-meta mt-2">Dates, methodology, evidence, scores and limitations are explicit on this page. No finding is fabricated.</p>
+  </div>
+</header>

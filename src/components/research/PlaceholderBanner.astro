@@ -1,0 +1,11 @@
+---
+export interface Props {
+  message?: string;
+}
+const { message = "Placeholder — not a real test. This template shows the structure. No scores or findings are fabricated." } = Astro.props as Props;
+---
+
+<div class="card p-4 border-l-4" style="border-left-color: var(--color-warning); background: #FFFBEB;">
+  <p class="text-sm font-semibold text-[var(--color-warning)]">Example — not a real test</p>
+  <p class="supporting mt-1">{message}</p>
+</div>

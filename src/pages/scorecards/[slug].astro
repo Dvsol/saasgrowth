@@ -1,0 +1,62 @@
+---
+import { getCollection } from "astro:content";
+import ResearchLayout from "../../layouts/ResearchLayout.astro";
+import ResearchHeader from "../../components/research/ResearchHeader.astro";
+import ScoreMatrix from "../../components/research/ScoreMatrix.astro";
+import EvidenceList from "../../components/research/EvidenceList.astro";
+import LimitationsNotice from "../../components/research/LimitationsNotice.astro";
+import PlaceholderBanner from "../../components/research/PlaceholderBanner.astro";
+import Container from "../../components/shared/Container.astro";
+import ScorecardTable from "../../components/scorecards/ScorecardTable.astro";
+
+export async function getStaticPaths() {
+  const scorecards = await getCollection("scorecards");
+  return scorecards.map(sc => ({ params: { slug: sc.data.slug }, props: { scorecard: sc } }));
+}
+
+const { scorecard } = Astro.props as any;
+const d = scorecard.data;
+---
+
+<ResearchLayout title={`${d.title} — Scorecard — EKIS`} description={d.title}>
+  <ResearchHeader
+    eyebrow={`Scorecard · ${d.department}`}
+    title={d.title}
+    testDate={d.testDate}
+    updatedAt={d.updatedAt}
+    methodology={d.methodology}
+    methodologyVersion={d.methodologyVersion}
+    testStatus={d.testStatus}
+    disclosure={d.disclosure}
+  />
+  <main id="main" class="section">
+    <Container>
+      <PlaceholderBanner message="Scorecard detail template — tasks, scores and evidence are explicit. No fabricated verdict." />
+      <div class="mt-6">
+        <ScoreMatrix taskDefinitions={d.taskDefinitions} results={d.results} verdicts={d.verdicts} testStatus={d.testStatus} />
+      </div>
+
+      <div class="mt-6 card overflow-hidden p-0">
+        <div class="p-5 border-b" style="border-color: var(--color-border)">
+          <h2 class="card-title">Product comparison</h2>
+          <p class="research-meta mt-1">Products: {d.productIds.join(", ")} — scores dated per methodology.</p>
+        </div>
+        <div class="overflow-x-auto">
+          <ScorecardTable
+            products={d.productIds.map((id:string)=>({id, name:id}))}
+            tasks={d.taskDefinitions.map((t:string,i:number)=>({id:`t${i}`, label: t.slice(0,28)}))}
+            testDate={d.testDate ? new Date(d.testDate).toLocaleDateString("en-CA") : null}
+            status={d.testStatus as any ?? "prototype"}
+            evidenceHref="/method"
+            disclosure={d.disclosure}
+          />
+        </div>
+      </div>
+
+      <div class="mt-6 grid gap-6 md:grid-cols-2">
+        <EvidenceList evidence={d.evidence} />
+        <LimitationsNotice limitations={d.limitations} />
+      </div>
+    </Container>
+  </main>
+</ResearchLayout>

@@ -1,0 +1,61 @@
+---
+import { getCollection } from "astro:content";
+import ResearchLayout from "../../layouts/ResearchLayout.astro";
+import ResearchHeader from "../../components/research/ResearchHeader.astro";
+import EvidenceList from "../../components/research/EvidenceList.astro";
+import LimitationsNotice from "../../components/research/LimitationsNotice.astro";
+import PlaceholderBanner from "../../components/research/PlaceholderBanner.astro";
+import VisibilityGrid from "../../components/visibility/VisibilityGrid.astro";
+import Container from "../../components/shared/Container.astro";
+
+export async function getStaticPaths() {
+  const snaps = await getCollection("visibilitySnapshots");
+  return snaps.map(s => ({ params: { slug: s.data.slug }, props: { snap: s } }));
+}
+
+const { snap } = Astro.props as any;
+const d = snap.data;
+const hasResults = d.results && d.results.length > 0;
+---
+
+<ResearchLayout title={`${d.testedBrand} — AI visibility — EKIS`} description={`AI visibility for ${d.testedBrand} across ChatGPT, Perplexity, Gemini.`}>
+  <ResearchHeader
+    eyebrow={`AI Visibility · ${d.category ?? ""}`}
+    title={`AI visibility: ${d.testedBrand}`}
+    testDate={d.testDate}
+    methodology={d.runsPerPrompt ? `${d.runsPerPrompt} runs per prompt` : undefined}
+    methodologyVersion={d.methodologyVersion}
+    testStatus={d.testStatus}
+    disclosure={d.disclosure}
+  />
+  <main id="main" class="section">
+    <Container>
+      <PlaceholderBanner message="AI visibility report template — prompts, platforms, Y/N/C/U scores and dated evidence are explicit. No fabricated mention is shown." />
+
+      <div class="mt-6">
+        <VisibilityGrid
+          prompts={(d.prompts ?? []).map((p:string,i:number)=>({id:`p${i}`, prompt:p}))}
+          platforms={(d.platforms ?? ["chatgpt","perplexity","gemini"]) as any}
+          rows={hasResults ? d.results : []}
+          testDate={d.testDate ? new Date(d.testDate).toLocaleDateString("en-CA") : null}
+          testedBrand={d.testedBrand}
+          evidenceHref="/method"
+          limitations={d.limitations}
+        />
+      </div>
+
+      <div class="mt-6 grid gap-6 md:grid-cols-2">
+        <div class="card p-6">
+          <h2 class="card-title">Methodology</h2>
+          <p class="supporting mt-3">{d.methodologyVersion ?? "v0.2 — placeholder"} — {d.runsPerPrompt ?? 0} runs per prompt across {d.platforms?.join(", ") ?? "—"}.</p>
+          <p class="research-meta mt-3">Y = mentioned, N = not mentioned, C = citation, U = unable. Mention ≠ citation.</p>
+        </div>
+        <LimitationsNotice limitations={d.limitations} />
+      </div>
+
+      <div class="mt-6">
+        <EvidenceList evidence={d.evidence} />
+      </div>
+    </Container>
+  </main>
+</ResearchLayout>

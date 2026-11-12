@@ -1,0 +1,45 @@
+---
+import { getCollection } from "astro:content";
+import ResearchLayout from "../../layouts/ResearchLayout.astro";
+import ResearchHeader from "../../components/research/ResearchHeader.astro";
+import ProductFacts from "../../components/research/ProductFacts.astro";
+import EvidenceList from "../../components/research/EvidenceList.astro";
+import LimitationsNotice from "../../components/research/LimitationsNotice.astro";
+import PlaceholderBanner from "../../components/research/PlaceholderBanner.astro";
+import Container from "../../components/shared/Container.astro";
+
+export async function getStaticPaths() {
+  const products = await getCollection("products");
+  return products.map(p => ({ params: { slug: p.data.slug }, props: { product: p } }));
+}
+
+const { product } = Astro.props as any;
+const data = product.data;
+---
+
+<ResearchLayout title={`${data.name} — Product profile — EKIS`} description={data.description}>
+  <ResearchHeader
+    eyebrow="Product profile"
+    title={data.name}
+    testDate={data.pricingCheckedAt}
+    updatedAt={data.updatedAt}
+    testStatus="prototype"
+    disclosure={data.disclosure}
+  />
+  <main id="main" class="section">
+    <Container>
+      <PlaceholderBanner />
+      <div class="mt-6 grid gap-6 lg:grid-cols-[1.4fr_0.9fr]">
+        <ProductFacts product={data} />
+        <div class="space-y-6">
+          <EvidenceList evidence={[]} />
+          <LimitationsNotice limitations={data.limitations} />
+        </div>
+      </div>
+      <div class="prose-ekis mt-8">
+        <slot />
+      </div>
+      <p class="research-meta mt-6">Profile last checked: {data.pricingCheckedAt ?? "—"} — verify pricing on vendor site.</p>
+    </Container>
+  </main>
+</ResearchLayout>

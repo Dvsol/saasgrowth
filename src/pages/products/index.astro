@@ -1,0 +1,32 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteHeader from "../../components/layout/SiteHeader.astro";
+import Container from "../../components/shared/Container.astro";
+import Card from "../../components/shared/Card.astro";
+import { siteConfig } from "../../lib/site";
+
+const products = await getCollection("products");
+---
+
+<BaseLayout title="Products — EKIS" description="Product profiles for SaaS tools we test. Dated, sourced, with pricing check dates.">
+  <SiteHeader logoText={siteConfig.brand.name} navigationItems={[...siteConfig.nav]} />
+  <main id="main" class="section">
+    <Container>
+      <p class="eyebrow">Research</p>
+      <h1 class="page-title mt-2">Product profiles</h1>
+      <p class="supporting mt-2 max-w-prose">Standardised profiles: website, category, pricing checked date, disclosures. No affiliate influence.</p>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {products.map(p => (
+          <a href={`/products/${p.data.slug}`} class="card p-5 block hover:border-[var(--color-ink)] transition-colors">
+            <p class="eyebrow text-[10px]">{p.data.category}</p>
+            <h3 class="card-title mt-2">{p.data.name}</h3>
+            <p class="supporting mt-2">{p.data.description}</p>
+            <p class="research-meta mt-3">Pricing checked: {p.data.pricingCheckedAt ?? "—"} • <span class="chip !py-1 text-[10px]">Placeholder</span></p>
+          </a>
+        ))}
+      </div>
+      {products.length === 0 && <Card muted padding="lg"><p class="supporting">No products yet.</p></Card>}
+    </Container>
+  </main>
+</BaseLayout>

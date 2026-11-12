@@ -1,0 +1,50 @@
+---
+import { getCollection } from "astro:content";
+import ResearchLayout from "../../layouts/ResearchLayout.astro";
+import ResearchHeader from "../../components/research/ResearchHeader.astro";
+import EvidenceList from "../../components/research/EvidenceList.astro";
+import LimitationsNotice from "../../components/research/LimitationsNotice.astro";
+import PlaceholderBanner from "../../components/research/PlaceholderBanner.astro";
+import Container from "../../components/shared/Container.astro";
+
+export async function getStaticPaths() {
+  const tests = await getCollection("tests");
+  return tests.map(t => ({ params: { id: t.data.id }, props: { test: t } }));
+}
+
+const { test } = Astro.props as any;
+const d = test.data;
+---
+
+<ResearchLayout title={`${d.testType} — Research record — EKIS`} description={`Research record ${d.id} — ${d.testType}, dated ${d.testDate?.toLocaleDateString?.() ?? d.testDate}`}>
+  <ResearchHeader
+    eyebrow={`Research record · ${d.testType}`}
+    title={d.testType}
+    testDate={d.testDate}
+    methodology={d.methodology}
+    methodologyVersion={d.methodologyVersion}
+    testStatus={d.testStatus as any}
+    disclosure={d.disclosure}
+  />
+  <main id="main" class="section">
+    <Container>
+      <PlaceholderBanner message="Standardised research record — all key metadata (dates, methodology, evidence, scores, limitations) explicit. No finding is fabricated." />
+      <div class="mt-6 grid gap-6 lg:grid-cols-[1.6fr_0.9fr]">
+        <div class="card p-6">
+          <h2 class="card-title">Test details</h2>
+          <dl class="mt-4 grid gap-3 text-sm">
+            <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Product</dt><dd class="text-[var(--color-muted)]">{d.productId ?? "—"}</dd></div>
+            <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Type</dt><dd class="text-[var(--color-muted)]">{d.testType}</dd></div>
+            <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Environment</dt><dd class="text-[var(--color-muted)]">{d.environment ?? "—"}</dd></div>
+            <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Settings</dt><dd class="text-[var(--color-muted)]">{d.settings ?? "—"}</dd></div>
+            <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Findings</dt><dd class="text-[var(--color-muted)]">{d.findings ?? "Pending — placeholder"}</dd></div>
+          </dl>
+        </div>
+        <div class="space-y-6">
+          <EvidenceList evidence={d.evidence} />
+          <LimitationsNotice limitations={d.limitations} />
+        </div>
+      </div>
+    </Container>
+  </main>
+</ResearchLayout>

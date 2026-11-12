@@ -1,0 +1,39 @@
+---
+export interface Props {
+  product: {
+    name: string;
+    website?: string;
+    category: string;
+    description: string;
+    targetAudience?: string;
+    pricing?: string;
+    pricingCheckedAt?: string;
+    productStatus?: string;
+    updatedAt?: Date;
+    disclosure?: string;
+    limitations?: string;
+  };
+}
+const { product } = Astro.props as Props;
+function fmt(d?: Date | string) {
+  if (!d) return "—";
+  const dt = d instanceof Date ? d : new Date(d);
+  return isNaN(dt.getTime()) ? String(d) : dt.toLocaleDateString("en-CA");
+}
+---
+
+<div class="card p-6">
+  <h2 class="card-title">Product facts</h2>
+  <dl class="mt-4 grid gap-3 text-sm">
+    <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Website</dt><dd class="text-[var(--color-muted)]">{product.website ? <a href={product.website} class="link break-all">{product.website}</a> : "—"}</dd></div>
+    <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Category</dt><dd class="text-[var(--color-muted)]">{product.category}</dd></div>
+    <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">For</dt><dd class="text-[var(--color-muted)]">{product.targetAudience ?? "—"}</dd></div>
+    <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Pricing</dt><dd class="text-[var(--color-muted)]">{product.pricing ?? "—"}</dd></div>
+    <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Pricing checked</dt><dd class="text-[var(--color-muted)]">{product.pricingCheckedAt ? fmt(product.pricingCheckedAt) : "—"}</dd></div>
+    <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Status</dt><dd><span class="chip">{product.productStatus ?? "—"}</span></dd></div>
+    <div class="flex gap-3"><dt class="font-semibold min-w-[140px]">Updated</dt><dd class="text-[var(--color-muted)]">{product.updatedAt ? fmt(product.updatedAt) : "—"}</dd></div>
+  </dl>
+  <p class="supporting mt-4">{product.description}</p>
+  {product.disclosure && <p class="research-meta mt-3 font-medium">{product.disclosure}</p>}
+  {product.limitations && <p class="research-meta mt-2">{product.limitations}</p>}
+</div>

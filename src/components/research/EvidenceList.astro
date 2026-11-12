@@ -1,0 +1,18 @@
+---
+export interface Props {
+  evidence?: string[];
+}
+const { evidence } = Astro.props as Props;
+---
+
+<section aria-labelledby="evidence-heading" class="card p-6">
+  <h2 id="evidence-heading" class="card-title">Evidence</h2>
+  {evidence && evidence.length > 0 ? (
+    <ul class="mt-3 space-y-2 list-disc list-inside text-sm text-[var(--color-muted)]">
+      {evidence.map(e => <li><a href={e} class="link break-all">{e}</a></li>)}
+    </ul>
+  ) : (
+    <p class="supporting mt-3"><strong>Example — not a real test.</strong> Evidence links (screenshots, exports, settings) will appear here when a dated run is published. No fabricated evidence is shown.</p>
+  )}
+  <p class="research-meta mt-3">Each score must have a dated evidence link to be considered completed.</p>
+</section>

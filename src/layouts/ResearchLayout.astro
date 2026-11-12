@@ -1,0 +1,28 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import SiteHeader from "../components/layout/SiteHeader.astro";
+import SiteFooter from "../components/layout/SiteFooter.astro";
+import Container from "../components/shared/Container.astro";
+import { siteConfig } from "../lib/site";
+
+export interface Props {
+  title: string;
+  description: string;
+  eyebrow?: string;
+  noindex?: boolean;
+}
+
+const { title, description, eyebrow, noindex } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} noindex={noindex}>
+  <SiteHeader logoText={siteConfig.brand.name} navigationItems={[...siteConfig.nav]} />
+  <slot />
+  <SiteFooter />
+</BaseLayout>
+
+<style is:global>
+  /* Research-specific helpers reuse tokens */
+  .research-meta { font-size: var(--text-meta); color: var(--color-muted); }
+  .research-prose { font-size: var(--text-body); line-height: var(--leading-body); max-width: var(--reading-width); }
+</style>
