@@ -1,0 +1,51 @@
+---
+/**
+ * MethodPreview — spec §6
+ * Three pillars editorial, no claims about unverified findings.
+ */
+export interface Props {
+  title?: string;
+  pillars?: { title: string; description: string }[];
+  href?: string;
+}
+
+const defaultPillars = [
+  {
+    title: "Real tasks",
+    description: "Products complete the same jobs a founder faces this week — not feature checkboxes.",
+  },
+  {
+    title: "Dated evidence",
+    description: "Screenshots, links and test labels show what we found and when. Nothing undated.",
+  },
+  {
+    title: "Independence",
+    description: "No vendor pays for a result. Testing is separate from any EKIS Storefront recommendation.",
+  },
+];
+
+const { title = "How we test", pillars = defaultPillars, href = "/method" } = Astro.props as Props;
+---
+
+<section class="rounded-[12px] border bg-[var(--color-paper)] overflow-hidden" style="border-color: var(--color-border);">
+  <div class="p-6 md:p-8">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div class="max-w-[560px]">
+        <p class="eyebrow mb-2">Our method</p>
+        <h2 class="section-heading my-0">{title}</h2>
+        <p class="supporting mt-3">Same tasks, same conditions, same time. Each test is dated and linked so you can audit claims — not trust them.</p>
+      </div>
+      <a href={href} class="btn btn-secondary">Read the method →</a>
+    </div>
+
+    <div class="mt-8 grid gap-4 md:grid-cols-3">
+      {pillars.map((p, i) => (
+        <div class="rounded-[12px] border p-5 bg-[var(--color-surface)]/40" style="border-color: var(--color-border)">
+          <p class="eyebrow text-[10px] mb-2">0{i + 1}</p>
+          <h3 class="card-title">{p.title}</h3>
+          <p class="supporting mt-2">{p.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

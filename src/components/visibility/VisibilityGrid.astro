@@ -1,0 +1,114 @@
+---
+/**
+ * VisibilityGrid — spec §6 + §7
+ * Props: prompts, platforms, results, testDate, testedBrand, evidenceHref
+ * Cell states: Y/N/C/U with textual labels, colour supplementary, separate mention vs citation.
+ */
+export type Platform = "chatgpt" | "perplexity" | "gemini";
+export type CellState = "Y" | "N" | "C" | "U" | null;
+
+export interface Prompt { id: string; prompt: string; }
+export interface Row { promptId: string; results: Record<Platform, CellState>; }
+
+export interface Props {
+  prompts: Prompt[];
+  platforms: Platform[];
+  rows: Row[];
+  testDate?: string | null;
+  testedBrand?: string | null;
+  evidenceHref?: string;
+  limitations?: string;
+}
+
+const { prompts, platforms, rows, testDate, testedBrand, evidenceHref, limitations } = Astro.props;
+
+const platformLabel: Record<Platform, string> = {
+  chatgpt: "ChatGPT",
+  perplexity: "Perplexity",
+  gemini: "Gemini",
+};
+
+function labelFor(state: CellState): { text: string; cls: string } {
+  if (state === "Y") return { text: "Y — Mentioned", cls: "bg-[var(--color-success)] text-white" };
+  if (state === "N") return { text: "N — Not mentioned", cls: "bg-[var(--color-border)] text-[var(--color-muted)]" };
+  if (state === "C") return { text: "C — Citation", cls: "bg-[var(--color-blue)] text-white" };
+  if (state === "U") return { text: "U — Unable to determine", cls: "bg-[var(--color-warning)] text-white" };
+  return { text: "—", cls: "bg-[var(--color-surface)] text-[var(--color-muted)] border" };
+}
+
+const hasData = rows.length > 0 && testDate;
+---
+
+<div class="rounded-[12px] overflow-hidden border" style="border-color: var(--color-border); background: var(--color-lab);">
+  <div class="p-6 border-b border-white/10">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-bold tracking-tight text-white">AI Visibility Snapshot</h2>
+        <p class="supporting mt-1 !text-white/70">Where do AI platforms mention this brand?</p>
+      </div>
+      <span class="chip bg-white/10 text-white border-white/20">{hasData ? `Tested: ${testDate}` : "Research coming soon"}</span>
+    </div>
+    {testedBrand ? (
+      <p class="meta mt-3 !text-white/60">Brand: <span class="font-semibold text-white">{testedBrand}</span> · 12-prompt method</p>
+    ) : (
+      <p class="meta mt-3 !text-white/60">No brand tested yet — snapshot will show dated test label and link to full record when published.</p>
+    )}
+  </div>
+
+  {hasData ? (
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <caption class="sr-only">AI visibility results — prompts by platform</caption>
+        <thead class="bg-white/5 text-white/70">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-semibold whitespace-nowrap">Prompt</th>
+            {platforms.map((p) => <th scope="col" class="px-4 py-3 font-semibold text-center whitespace-nowrap">{platformLabel[p]}</th>)}
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/10">
+          {prompts.map((prompt) => {
+            const row = rows.find((r) => r.promptId === prompt.id);
+            return (
+              <tr class="hover:bg-white/5">
+                <th scope="row" class="px-4 py-3 font-medium text-white/90 max-w-[520px]">
+                  <span class="line-clamp-2">{prompt.prompt}</span>
+                </th>
+                {platforms.map((plat) => {
+                  const state = row?.results[plat] ?? null;
+                  const { text, cls } = labelFor(state);
+                  return (
+                    <td class="px-4 py-3 text-center">
+                      <span class={`inline-flex items-center justify-center rounded-full px-2.5 py-1 text-xs font-semibold border-transparent ${cls}`} title={text}>
+                        {state ?? "—"}
+                        <span class="sr-only"> — {text}</span>
+                      </span>
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  ) : (
+    <div class="p-8 text-center">
+      <div class="mx-auto max-w-[520px] rounded-lg bg-white/5 border border-white/10 p-6">
+        <p class="text-sm font-semibold text-white">No completed tests yet</p>
+        <p class="supporting mt-2 !text-white/60">This panel will show 12 prompts × 3 platforms with Y/N/C/U states, dated test label and link to full research record when first snapshot is published. Mention and citation are tracked separately.</p>
+        <div class="mt-4 flex flex-wrap justify-center gap-2">
+          <span class="chip bg-white text-[var(--color-ink)]">Y — Mentioned</span>
+          <span class="chip bg-white text-[var(--color-ink)]">N — Not mentioned</span>
+          <span class="chip bg-white text-[var(--color-ink)]">C — Citation</span>
+          <span class="chip bg-white text-[var(--color-ink)]">U — Unable</span>
+        </div>
+      </div>
+      <p class="meta mt-4 !text-white/50">Responsive: table scrolls horizontally in its container. Colour is supplementary — labels are always visible.</p>
+    </div>
+  )}
+
+  <div class="px-6 py-4 bg-white/5 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
+    <span class="meta !text-white/60">{limitations ?? "Mention ≠ citation. See methodology for definitions."}</span>
+    {evidenceHref && <a href={evidenceHref} class="text-sm font-semibold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white">View research record →</a>}
+  </div>
+</div>

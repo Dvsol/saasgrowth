@@ -1,0 +1,47 @@
+---
+import Container from "../shared/Container.astro";
+import { siteConfig } from "../../lib/site";
+
+export interface FooterLink { label: string; href: string; }
+export interface Props {
+  year?: number;
+}
+const { year = new Date().getFullYear() } = Astro.props;
+---
+
+<footer class="border-t" style="border-color: var(--color-border); background: var(--color-surface)" aria-labelledby="footer-heading">
+  <h2 id="footer-heading" class="sr-only">Footer</h2>
+  <Container>
+    <div class="py-10 grid gap-8 md:grid-cols-[1.2fr_1fr_0.9fr]">
+      <div>
+        <p class="font-bold tracking-tight text-[var(--color-ink)]">EKIS</p>
+        <p class="eyebrow mt-1 !text-[10px] tracking-widest">Independent software research</p>
+        <p class="supporting mt-3 max-w-sm">Tests and comparisons for the tools SaaS founders use to grow. Same tasks, dated evidence, separate from any storefront advice.</p>
+        <p class="meta mt-3">Payment never changes a score. <a href="/independence" class="link font-semibold">Independence & disclosure →</a></p>
+        <p class="meta mt-2">No fabricated scores, dates or screenshots. Empty states are labelled.</p>
+      </div>
+
+      <nav aria-label="Footer primary" class="grid grid-cols-2 gap-x-6 gap-y-2 content-start">
+        {siteConfig.footer.primary.map((item) => (
+          <a href={item.href} class="link-muted text-sm py-1">{item.label}</a>
+        ))}
+      </nav>
+
+      <div class="space-y-3">
+        <p class="meta">© {year} EKIS. All rights reserved.</p>
+        <p class="meta">Publication independent of <a href="https://ekis.store" class="link">EKIS Storefront</a>. Questions? <a href="/contact" class="link">Contact</a>.</p>
+        <p class="meta">Built with Astro + Tailwind CSS · Cloudflare Workers Static Assets · No database.</p>
+        <div class="flex flex-wrap gap-2 pt-1">
+          <a href="/method" class="chip hover:border-[var(--color-ink)] transition-colors">Method</a>
+          <a href="/scorecards" class="chip hover:border-[var(--color-ink)] transition-colors">Scorecards</a>
+          <a href="/ai-visibility" class="chip hover:border-[var(--color-ink)] transition-colors">AI Visibility</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t py-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between" style="border-color: var(--color-border)">
+      <p class="meta">Spec: tokens single source in <code>tokens.css</code>. Typography Inter locally hosted, reading width 680–740px.</p>
+      <p class="meta">Status: Milestone 2 — no completed product tests yet.</p>
+    </div>
+  </Container>
+</footer>

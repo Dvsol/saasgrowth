@@ -1,0 +1,21 @@
+---
+/**
+ * WorkWithMeTeaser — spec §6 homepage teaser (no claims/testimonials)
+ */
+export interface Props {
+  href?: string;
+}
+const { href = "/work-with-me" } = Astro.props;
+---
+
+<section class="section-narrow">
+  <div class="rounded-[12px] border p-6 md:p-8 flex flex-col md:flex-row items-start justify-between gap-6 bg-[var(--color-paper)]" style="border-color: var(--color-border);">
+    <div>
+      <p class="eyebrow mb-2">Work with me</p>
+      <h2 class="section-heading my-0">Advice without the pitch</h2>
+      <p class="supporting mt-3 max-w-[560px]">Advisory and audits for SaaS teams — independent from the research. No commissions, no affiliate fees for coverage.</p>
+    </div>
+    <a href={href} class="btn btn-primary shrink-0">Work with me</a>
+  </div>
+  <p class="meta mt-3 text-center">Research and advisory operate separately. No paid placement in scorecards or snapshots.</p>
+</section>

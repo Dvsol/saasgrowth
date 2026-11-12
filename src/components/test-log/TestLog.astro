@@ -1,0 +1,78 @@
+---
+/**
+ * TestLog — spec §6 + §7 TestLogRow
+ * Props: entries with date, title, type, status, href
+ * Statuses: Planned, In progress, Completed (only when checked ready)
+ */
+export type TestStatus = "planned" | "in_progress" | "completed";
+export interface Entry {
+  id: string;
+  date: string;
+  title: string;
+  type: string;
+  status: TestStatus;
+  href?: string;
+}
+export interface Props {
+  entries: Entry[];
+}
+const { entries } = Astro.props;
+
+function statusLabel(s: TestStatus) {
+  if (s === "planned") return { label: "Planned", cls: "bg-[var(--color-surface)] text-[var(--color-muted)] border" };
+  if (s === "in_progress") return { label: "In progress", cls: "bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]" };
+  return { label: "Completed", cls: "bg-[var(--color-success)] text-white" };
+}
+
+const isEmpty = entries.length === 0;
+---
+
+<div class="card overflow-hidden p-0">
+  <div class="p-5 border-b flex items-center justify-between" style="border-color: var(--color-border)">
+    <h3 class="text-sm font-bold tracking-tight text-[var(--color-ink)]">Dated test log</h3>
+    <span class="meta">{entries.length} entr{entries.length === 1 ? "y" : "ies"}</span>
+  </div>
+
+  {isEmpty ? (
+    <div class="p-8 text-center">
+      <p class="text-sm font-semibold text-[var(--color-ink)]">No completed tests yet</p>
+      <p class="supporting mt-2">When research is published, each entry will show date, product/category, test type and status with a link to its record.</p>
+    </div>
+  ) : (
+    <div class="overflow-x-auto">
+      <table class="w-full text-left" style="font-size: var(--text-table)">
+        <caption class="sr-only">Chronological test log</caption>
+        <thead class="bg-[var(--color-surface)] text-[var(--color-muted)]">
+          <tr>
+            <th scope="col" class="px-4 py-3 font-semibold whitespace-nowrap">Date</th>
+            <th scope="col" class="px-4 py-3 font-semibold">Product or category</th>
+            <th scope="col" class="px-4 py-3 font-semibold whitespace-nowrap">Test type</th>
+            <th scope="col" class="px-4 py-3 font-semibold whitespace-nowrap">Status</th>
+            <th scope="col" class="px-4 py-3 font-semibold whitespace-nowrap"><span class="sr-only">Link</span></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y" style="border-color: var(--color-border)">
+          {entries.map((e) => {
+            const s = statusLabel(e.status);
+            return (
+              <tr class="hover:bg-[var(--color-surface)]/60">
+                <td class="px-4 py-3 whitespace-nowrap font-medium">{e.date}</td>
+                <td class="px-4 py-3">{e.href ? <a href={e.href} class="link font-medium">{e.title}</a> : <span class="font-medium">{e.title}</span>}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-[var(--color-muted)]">{e.type}</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class={`chip !py-1 ${s.cls}`}>
+                    <span class="status-dot" style={`background: ${e.status === "completed" ? "var(--color-success)" : e.status === "in_progress" ? "#F59E0B" : "var(--color-border)"}`}></span>
+                    {s.label}
+                  </span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-right">
+                  {e.href ? <a href={e.href} class="link text-xs font-semibold">View →</a> : <span class="meta">—</span>}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>

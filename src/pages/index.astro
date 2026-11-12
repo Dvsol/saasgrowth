@@ -1,11 +1,21 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SiteHeader from "../components/layout/SiteHeader.astro";
+import SiteFooter from "../components/layout/SiteFooter.astro";
 import Container from "../components/shared/Container.astro";
-import Card from "../components/shared/Card.astro";
-import Button from "../components/shared/Button.astro";
 import SectionHeading from "../components/shared/SectionHeading.astro";
+import ScorecardTable from "../components/scorecards/ScorecardTable.astro";
+import DepartmentTile from "../components/departments/DepartmentTile.astro";
+import VisibilityGrid from "../components/visibility/VisibilityGrid.astro";
+import TestLog from "../components/test-log/TestLog.astro";
+import MethodPreview from "../components/editorial/MethodPreview.astro";
+import WorkWithMeTeaser from "../components/editorial/WorkWithMeTeaser.astro";
+import HomeDisclosures from "../components/disclosures/HomeDisclosures.astro";
 import { siteConfig } from "../lib/site";
+import { departments } from "../lib/content/departments";
+import { featuredScorecard } from "../lib/content/scorecards";
+import { latestSnapshot } from "../lib/content/visibility";
+import { testLog } from "../lib/content/testLog";
 
 const title = "Independent tests of the tools SaaS founders use to grow. — EKIS";
 const description = "Same tasks, same sample data, scored and dated. Independent SaaS growth publication testing AI Search Visibility software.";
@@ -15,213 +25,126 @@ const description = "Same tasks, same sample data, scored and dated. Independent
   <SiteHeader logoText={siteConfig.brand.name} navigationItems={[...siteConfig.nav]} />
 
   <main id="main">
-    <!-- Hero — M1 only: structure + tokens, featured table is clearly prototype (spec 6.) -->
+    <!-- 1 — Hero + Featured scorecard -->
     <section class="section border-b" style="border-color: var(--color-border)">
       <Container>
-        <div class="grid items-start gap-10 lg:grid-cols-[1.08fr_0.92fr]">
+        <div class="grid items-start gap-10 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
-            <p class="eyebrow">Independent software research</p>
+            <p class="eyebrow">Independent software research — M2</p>
             <h1 class="page-title mt-3" style="font-size: var(--text-hero);">Independent tests of the tools SaaS founders use to grow.</h1>
-            <p class="mt-4 max-w-prose text-[1.05rem] leading-relaxed text-[var(--color-muted)]">Same tasks, same sample data, scored and dated.</p>
+            <p class="mt-4 max-w-prose text-[1.05rem] leading-relaxed text-[var(--color-muted)]">Same tasks, same sample data, scored and dated. AI Search Visibility first. Every claim linked to dated evidence.</p>
             <div class="mt-6 flex flex-wrap gap-3">
-              <Button href="/scorecards/ai-visibility" variant="primary">See the latest scorecard</Button>
-              <Button href="/method" variant="secondary">How we test</Button>
+              <a href="/scorecards" class="btn btn-primary">See the latest scorecard</a>
+              <a href="/method" class="btn btn-secondary">How we test</a>
             </div>
-            <p class="meta mt-3">No invented scores. Featured table below is a visual prototype until first test is published.</p>
+            <p class="meta mt-3">No invented scores. Featured table is a prototype until first test is published — verdicts show Pending with test date “—”.</p>
           </div>
 
-          <!-- Featured comparison — prototype state per spec -->
-          <Card padding="none" muted>
-            <div class="p-5 border-b" style="border-color: var(--color-border)">
-              <div class="flex items-center justify-between">
-                <p class="text-sm font-semibold text-[var(--color-ink)]">Featured scorecard</p>
-                <span class="chip">Prototype — no scores yet</span>
-              </div>
-              <p class="meta mt-1">AI Search Visibility — sample structure only. No product data has been fabricated.</p>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-sm" style="font-size: var(--text-table)">
-                <caption class="sr-only">Example scorecard structure — prototype, no real results</caption>
-                <thead class="bg-[var(--color-surface)] text-[var(--color-muted)]">
-                  <tr>
-                    <th scope="col" class="px-4 py-3 font-semibold">Product</th>
-                    <th scope="col" class="px-4 py-3 font-semibold">Task A</th>
-                    <th scope="col" class="px-4 py-3 font-semibold">Task B</th>
-                    <th scope="col" class="px-4 py-3 font-semibold">Task C</th>
-                    <th scope="col" class="px-4 py-3 font-semibold">Verdict</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y" style="border-color: var(--color-border)">
-                  <tr><th scope="row" class="px-4 py-3 font-medium">Product A</th><td class="px-4 py-3 text-[var(--color-muted)]">—</td><td class="px-4 py-3 text-[var(--color-muted)]">—</td><td class="px-4 py-3 text-[var(--color-muted)]">—</td><td class="px-4 py-3"><span class="chip">Pending</span></td></tr>
-                  <tr><th scope="row" class="px-4 py-3 font-medium">Product B</th><td class="px-4 py-3 text-[var(--color-muted)]">—</td><td class="px-4 py-3 text-[var(--color-muted)]">—</td><td class="px-4 py-3 text-[var(--color-muted)]">—</td><td class="px-4 py-3"><span class="chip">Pending</span></td></tr>
-                  <tr><th scope="row" class="px-4 py-3 font-medium">Product C</th><td class="px-4 py-3 text-[var(--color-muted)]">—</td><td class="px-4 py-3 text-[var(--color-muted)]">—</td><td class="px-4 py-3 text-[var(--color-muted)]">—</td><td class="px-4 py-3"><span class="chip">Pending</span></td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="p-4 flex items-center justify-between bg-[var(--color-surface)] rounded-b-[12px]">
-              <span class="meta">Tested: — · Dated evidence only</span>
-              <a href="/scorecards" class="link text-sm font-semibold">View scorecards →</a>
-            </div>
-          </Card>
+          <div id="featured-scorecard">
+            <ScorecardTable
+              products={featuredScorecard.products}
+              tasks={featuredScorecard.tasks}
+              testDate={featuredScorecard.testDate}
+              status={featuredScorecard.status}
+              evidenceHref={featuredScorecard.evidenceHref}
+              disclosure={featuredScorecard.disclosure}
+            />
+          </div>
         </div>
       </Container>
     </section>
 
-    <!-- Browse by job — M1: layout only, counts only when real data exists -->
-    <section class="section">
+    <!-- 2 — Browse by job: six department tiles -->
+    <section class="section" aria-labelledby="departments-heading" id="departments">
       <Container>
-        <SectionHeading eyebrow="Browse by job" title="Start from the job you’re hiring software to do" description="Six departments. AI Search Visibility is active first. Others are future research areas — no fabricated counts." />
+        <SectionHeading
+          eyebrow="Browse by job"
+          title="Start from the job you’re hiring software to do"
+          description="Six departments. AI Search Visibility is active first. Others are future research areas — no fabricated counts. Published research shows “—” until first test is complete."
+        />
+        <h2 id="departments-heading" class="sr-only">Departments</h2>
         <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            { n: "01", title: "AI Search Visibility", desc: "Where AI platforms mention your brand — prompts, citations, dated snapshots.", href: "/ai-visibility", status: "Active" },
-            { n: "02", title: "SEO & Content", desc: "Content systems that help SaaS teams publish and rank.", href: "/scorecards", status: "Future" },
-            { n: "03", title: "Email & Lifecycle", desc: "Email, onboarding and lifecycle tools for product-led growth.", href: "/scorecards", status: "Future" },
-            { n: "04", title: "Analytics & Reporting", desc: "Product and marketing analytics for bootstrapped teams.", href: "/scorecards", status: "Future" },
-            { n: "05", title: "Reviews & Social Proof", desc: "Review collection and proof systems for trust.", href: "/scorecards", status: "Future" },
-            { n: "06", title: "Sales & CRM", desc: "CRM and sales pipeline tools for founder-led sales.", href: "/scorecards", status: "Future" },
-          ].map((d) => (
-            <Card href={`/departments/${d.n}`} as="a" padding="md">
-              <div class="flex items-start justify-between gap-3">
-                <span class="text-xs font-bold tracking-widest text-[var(--color-muted)]">{d.n}</span>
-                <span class={`chip ${d.status === "Active" ? "chip-active" : ""}`}>{d.status}</span>
-              </div>
-              <h3 class="card-title mt-3">{d.title}</h3>
-              <p class="supporting mt-2">{d.desc}</p>
-              <p class="meta mt-3">Published research: —</p>
-            </Card>
+          {departments.map((d) => (
+            <DepartmentTile
+              number={d.number}
+              title={d.title}
+              description={d.description}
+              href={d.href}
+              publishedCount={d.publishedCount}
+              status={d.status}
+            />
           ))}
         </div>
       </Container>
     </section>
 
-    <!-- Foundations showcase — proves M1 tokens/primitives -->
-    <section class="section border-y" style="background: var(--color-surface); border-color: var(--color-border)">
+    <!-- 3 — AI Visibility Snapshot -->
+    <section class="section" aria-labelledby="visibility-heading" id="ai-visibility">
       <Container>
-        <SectionHeading eyebrow="Milestone 1 — Foundations" title="Design tokens, typography, layout and reusable primitives" description="This section is the M1 acceptance checklist. It renders every token and component live." />
-
-        <!-- Tokens -->
-        <div class="mt-8 grid gap-4 lg:grid-cols-3">
-          <Card>
-            <h3 class="card-title">Colours</h3>
-            <div class="mt-4 grid grid-cols-2 gap-3">
-              {[
-                ["ink", "#142B4A"],
-                ["blue", "#2563EB"],
-                ["paper", "#FFFFFF"],
-                ["surface", "#F7F9FC"],
-                ["border", "#E2E8F0"],
-                ["muted", "#475569"],
-                ["lab", "#0B1220"],
-                ["success", "#15803D"],
-                ["danger", "#B91C1C"],
-                ["warning", "#A16207"],
-              ].map(([name, hex]) => (
-                <div class="flex items-center gap-2">
-                  <span class="h-8 w-8 rounded-full border" style={`background:${hex}; border-color: var(--color-border)`}></span>
-                  <span class="text-sm"><span class="font-semibold">{name}</span><br/><span class="meta">{hex}</span></span>
-                </div>
-              ))}
-            </div>
-            <p class="meta mt-4">All components use <code>var(--color-…)</code>. No hardcoded hex outside <code>tokens.css</code>.</p>
-          </Card>
-
-          <Card>
-            <h3 class="card-title">Typography — Inter</h3>
-            <p class="mt-3" style="font-size: var(--text-hero-sm); line-height: 1.05; font-weight:700; letter-spacing:-0.02em;">Hero 52–60 px</p>
-            <p class="mt-2 page-title text-balance">Page heading 40–48 px</p>
-            <p class="mt-2 section-title">Section heading 28–32 px</p>
-            <p class="mt-2 card-title">Card heading 18–20 px</p>
-            <p class="mt-2" style="font-size: var(--text-body)">Body 16–18 px · line-height 1.6 · reading width 680–740 px</p>
-            <p class="mt-1 supporting">Supporting 14 px · Meta 12–13 px · Tables 13–14 px</p>
-            <div class="mt-4 flex flex-wrap gap-2"><span class="chip">Inter locally hosted</span><span class="chip">WCAG AA contrast</span></div>
-          </Card>
-
-          <Card>
-            <h3 class="card-title">Spacing & layout</h3>
-            <div class="mt-4 flex gap-2">
-              {[4,8,12,16,24,32,48,64,80].map(n => <span class="chip">{n}px</span>)}
-            </div>
-            <ul class="mt-4 space-y-1 supporting list-disc list-inside">
-              <li>Max width 1,200–1,280 px</li>
-              <li>Gutters: 32 desktop / 28 tablet / 20 mobile</li>
-              <li>Card radius 8–12 px · Border 1 px</li>
-              <li>Shadows minimal and purposeful</li>
-            </ul>
-            <div class="mt-4 flex gap-2">
-              <span class="chip">container-shell</span><span class="chip">container-narrow</span><span class="chip">section</span>
-            </div>
-          </Card>
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <p class="eyebrow">AI Search Visibility · snapshot</p>
+          <a href="/method" class="meta link">Mention ≠ citation · How we measure →</a>
         </div>
-
-        <!-- Buttons / links / states -->
-        <div class="mt-6 grid gap-4 lg:grid-cols-2">
-          <Card>
-            <h3 class="card-title">Buttons & links</h3>
-            <div class="mt-4 flex flex-wrap gap-3">
-              <Button variant="primary">Primary</Button>
-              <Button variant="secondary">Secondary</Button>
-              <Button variant="ghost">Ghost</Button>
-              <a href="#" class="link font-semibold">Text link →</a>
-            </div>
-            <div class="mt-4 flex flex-wrap gap-3">
-              <Button variant="primary" disabled>Disabled</Button>
-              <span class="chip"><span class="status-dot" style="background: var(--color-success)"></span> Success<span class="sr-only"> — success</span></span>
-              <span class="chip"><span class="status-dot" style="background: var(--color-danger)"></span> Danger<span class="sr-only"> — danger</span></span>
-              <span class="chip"><span class="status-dot" style="background: var(--color-warning)"></span> Warning</span>
-            </div>
-            <p class="meta mt-4">Colour is never the only signal — labels and icons accompany status. Keyboard focus is visible via <code>--focus-ring</code>.</p>
-          </Card>
-
-          <Card muted>
-            <h3 class="card-title">Responsive & a11y</h3>
-            <ul class="mt-3 supporting list-disc list-inside space-y-1">
-              <li>Mobile menu: button with <code>aria-expanded</code> + <code>aria-controls</code>, Escape to close, body scroll lock, hides at 1024 px</li>
-              <li>Noscript fallback with &lt;noscript&gt; details/summary</li>
-              <li>Skip link, semantic headings, table <code>scope</code> and caption</li>
-              <li>Checked at 375, 390, 768, 1024, 1440 px</li>
-            </ul>
-            <div class="mt-4 flex gap-2">
-              <span class="chip">Playwright</span><span class="chip">axe-core</span><span class="chip">Lighthouse 90+ target</span>
-            </div>
-          </Card>
+        <h2 id="visibility-heading" class="sr-only">AI Visibility Snapshot</h2>
+        <div class="mt-4">
+          <VisibilityGrid
+            prompts={latestSnapshot.prompts}
+            platforms={latestSnapshot.platforms as any}
+            rows={latestSnapshot.rows as any}
+            testDate={latestSnapshot.testDate}
+            testedBrand={latestSnapshot.testedBrand}
+            evidenceHref={latestSnapshot.evidenceHref}
+            limitations={latestSnapshot.limitations}
+          />
         </div>
+        <p class="meta mt-3">12 prompts × 3 platforms. Each cell shows Y (Mentioned), N (Not mentioned), C (Citation) or U (Unable). Dated test label and link to full record added when published.</p>
       </Container>
     </section>
 
-    <!-- Placeholder for future M2 sections — shows architecture without fabricating -->
-    <section class="section">
+    <!-- 4 — Dated test log -->
+    <section class="section border-y" style="border-color: var(--color-border); background: var(--color-surface)" aria-labelledby="testlog-heading" id="test-log">
       <Container>
-        <div class="card p-8 text-center">
-          <p class="eyebrow">Next</p>
-          <h2 class="section-title mt-2">Milestone 2 will add</h2>
-          <p class="supporting mt-2 max-w-prose mx-auto">Hero featured scorecard with real test data, department grids with live counts, AI visibility snapshot (Y/N/C/U with textual labels), dated test log, method preview, Work with me, and footer — when content exists.</p>
-          <p class="meta mt-3">No fabricated research. Prototype states are labelled as prototype.</p>
+        <SectionHeading
+          eyebrow="Evidence"
+          title="Dated test log"
+          description="Every test is dated. Statuses: Planned, In progress, Completed — the last only when checked and ready for publication. No completed research is claimed yet."
+        />
+        <h2 id="testlog-heading" class="sr-only">Dated test log</h2>
+        <div class="mt-6">
+          <TestLog entries={testLog as any} />
         </div>
+        <p class="meta mt-3">Planned and In progress entries show what is queued. A row becomes Completed only when evidence is published.</p>
+      </Container>
+    </section>
+
+    <!-- 5 — Method preview -->
+    <section class="section" aria-labelledby="method-preview-heading" id="method">
+      <Container>
+        <h2 id="method-preview-heading" class="sr-only">Method preview</h2>
+        <MethodPreview />
+      </Container>
+    </section>
+
+    <!-- 6 — Work with me teaser -->
+    <section class="section pt-0" aria-labelledby="work-heading" id="work-with-me">
+      <Container>
+        <h2 id="work-heading" class="sr-only">Work with me</h2>
+        <WorkWithMeTeaser />
+      </Container>
+    </section>
+
+    <!-- Disclosures -->
+    <section class="section pt-0" aria-labelledby="disclosures-heading">
+      <Container>
+        <h2 id="disclosures-heading" class="sr-only">Disclosures</h2>
+        <HomeDisclosures />
       </Container>
     </section>
   </main>
 
-  <footer class="border-t" style="border-color: var(--color-border); background: var(--color-surface)">
-    <Container>
-      <div class="py-10 grid gap-8 lg:grid-cols-3">
-        <div>
-          <p class="font-bold tracking-tight">EKIS</p>
-          <p class="supporting mt-2 max-w-sm">Independent SaaS growth publication. Tests, comparisons and explainers for the tools founders use to acquire customers.</p>
-          <p class="meta mt-4">Payment never changes an independent score. <a href="/independence" class="link">Independence policy →</a></p>
-        </div>
-        <nav aria-label="Footer" class="grid grid-cols-2 gap-6">
-          {siteConfig.footer.primary.map(item => <a href={item.href} class="link-muted text-sm">{item.label}</a>)}
-        </nav>
-        <div class="meta">
-          <p>© {new Date().getFullYear()} EKIS. All rights reserved.</p>
-          <p class="mt-1">Built with Astro + Tailwind on Cloudflare Workers Static Assets. No database in M1.</p>
-        </div>
-      </div>
-    </Container>
-  </footer>
+  <SiteFooter />
 </BaseLayout>
 
 <style>
-  /* Page-specific: ensure table scrolls in its container on narrow */
   table { border-collapse: collapse; }
 </style>

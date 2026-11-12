@@ -72,6 +72,10 @@
     margin-inline: auto;
   }
 
+  .section-narrow {
+    width: min(100% - 2 * var(--gutter-mobile), var(--content-max-narrow));
+    margin-inline: auto;
+  }
   .section {
     padding-block: var(--space-12);
   }

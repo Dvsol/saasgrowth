@@ -1,0 +1,58 @@
+---
+/**
+ * ScorecardTable — reusable, spec §7
+ * Props mirror spec: products, tasks, verdicts, testDate, status, evidenceLinks
+ * Must not display invented values; shows empty state when prototype.
+ */
+export interface Props {
+  products: { id: string; name: string }[];
+  tasks: { id: string; label: string }[];
+  verdicts?: (string | null)[];
+  testDate?: string | null;
+  status: "prototype" | "planned" | "in_progress" | "completed";
+  evidenceHref?: string;
+  disclosure?: string;
+}
+const { products, tasks, verdicts, testDate, status, evidenceHref, disclosure } = Astro.props;
+
+const isPrototype = status === "prototype";
+---
+
+<div class="card overflow-hidden p-0">
+  <div class="p-5 border-b flex items-center justify-between gap-3" style="border-color: var(--color-border)">
+    <div>
+      <p class="text-sm font-semibold text-[var(--color-ink)]">Featured scorecard</p>
+      <p class="meta mt-1">{disclosure ?? "Prototype structure only — no product data has been fabricated."}</p>
+    </div>
+    <span class="chip shrink-0">{isPrototype ? "Prototype — no scores yet" : status === "planned" ? "Planned" : status === "in_progress" ? "In progress" : "Completed"}</span>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left" style="font-size: var(--text-table)">
+      <caption class="sr-only">Scorecard structure — {isPrototype ? "prototype, no real results" : "dated research"}</caption>
+      <thead class="bg-[var(--color-surface)] text-[var(--color-muted)]">
+        <tr>
+          <th scope="col" class="px-4 py-3 font-semibold whitespace-nowrap">Product</th>
+          {tasks.map((t) => <th scope="col" class="px-4 py-3 font-semibold whitespace-nowrap">{t.label}</th>)}
+          <th scope="col" class="px-4 py-3 font-semibold whitespace-nowrap">Verdict</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y" style="border-color: var(--color-border)">
+        {products.map((p, i) => (
+          <tr>
+            <th scope="row" class="px-4 py-3 font-medium whitespace-nowrap">{p.name}</th>
+            {tasks.map(() => <td class="px-4 py-3 text-[var(--color-muted)]">—</td>)}
+            <td class="px-4 py-3">
+              {isPrototype ? <span class="chip">Pending</span> : verdicts?.[i] ? verdicts[i] : <span class="chip">Pending</span>}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="p-4 flex flex-wrap items-center justify-between gap-3 bg-[var(--color-surface)] rounded-b-[12px]">
+    <span class="meta">Tested: {testDate ?? "—"} · Dated evidence only</span>
+    {evidenceHref && <a href={evidenceHref} class="link text-sm font-semibold">View scorecards →</a>}
+  </div>
+</div>

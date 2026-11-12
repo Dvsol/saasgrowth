@@ -1,0 +1,28 @@
+---
+/**
+ * DepartmentTile — spec §7
+ * Props: number, title, description, href, publishedCount, status
+ * Never fabricate counts — show empty state when null.
+ */
+export interface Props {
+  number: string;
+  title: string;
+  description: string;
+  href: string;
+  publishedCount: number | null;
+  status: "active" | "future";
+}
+const { number, title, description, href, publishedCount, status } = Astro.props;
+---
+
+<a href={href} class="card p-6 block hover:border-[var(--color-ink)] transition-colors group focus-visible:outline-offset-2">
+  <div class="flex items-start justify-between gap-3">
+    <span class="text-xs font-bold tracking-widest text-[var(--color-muted)]">{number}</span>
+    <span class={`chip ${status === "active" ? "chip-active" : ""}`}>{status === "active" ? "Active" : "Future"}</span>
+  </div>
+  <h3 class="card-title mt-3 group-hover:text-[var(--color-blue)] transition-colors">{title}</h3>
+  <p class="supporting mt-2">{description}</p>
+  <p class="meta mt-3">
+    {publishedCount === null ? "Published research: —" : `Published research: ${publishedCount}`}
+  </p>
+</a>
